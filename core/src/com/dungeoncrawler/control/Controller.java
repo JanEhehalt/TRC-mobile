@@ -904,8 +904,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     //if(button == Input.Buttons.LEFT){
         switch(click(screenX, screenY)){
             case -1:  // -1: nothing hit -- 0: go ingame -- 1: EXIT game -- 2: goto settings -- 3: goto controls -- 4: goto MainMenuScreen -- 9: volume down -- 10: volume up -- 11: restart game
-
-              return true;
+                break;
             case 0:
                 mm.cleanUp();
                 mm = null;
@@ -913,19 +912,19 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 gs.generateEntitySprites(d.getCurrentEntities());
                 hc = new HudContainer();
                 gs.startLoadingScreen();
-                return true;
+                break;
 
             case 1:
                 mm.cleanUp();
                 mm = null;
                 gs = new GameScreen(d, volume);
-                return true;
+                break;
 
             case 2:
                 mm.hide();
                 cs = null;
                 ss = new SettingsScreen();
-                return true;
+                break;
 
             case 3:
                 if(mm != null){
@@ -933,22 +932,22 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 }
                 ss = null;
                 cs = new ControlsScreen();
-                return true;
+                break;
 
             case 4:
                 ss = null;
                 cs = null;
                 mm.show();
-                return true;
+                break;
             
             case 5:
                 resume();
-                return true;
+                break;
                 
             case 6:
                 d.getPlayer().setSkin(mm.getSkin());
                 d.getPlayer().setGender(mm.getGender());
-                return true;
+                break;
                 
                 
             case 9:
@@ -961,7 +960,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 if(gs != null){
                     gs.music.setVolume(volume);
                 }
-                return true;   
+                break;
             case 10:
                 if(volume < 1f){
                     volume += 0.05f;
@@ -973,10 +972,10 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 if(gs != null){
                     gs.music.setVolume(volume);
                 }
-                return true;
+                break;
             case 11:
                 create();
-                return true;
+                break;
         }
 
         if(gs == null){
@@ -986,7 +985,6 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
             gs.generateEntitySprites(d.getCurrentEntities());
             hc = new HudContainer();
             gs.startLoadingScreen();
-            return true;
         }
         else if(gs != null && gs.getIsLoading() == false) {
               if (screenX < 0.5 * Gdx.graphics.getWidth()) {
@@ -996,8 +994,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                   d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
               }
           }
-          return true;
-        }
+
     //}
       return true;
     }

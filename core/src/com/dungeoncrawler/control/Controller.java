@@ -987,12 +987,18 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
             gs.startLoadingScreen();
         }
         else if(gs != null && gs.getIsLoading() == false) {
-              if (screenX < 0.5 * Gdx.graphics.getWidth()) {
+              if (screenX < 0.25 * Gdx.graphics.getWidth()) {
                   d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
               }
-              if (screenX > 0.5 * Gdx.graphics.getWidth()) {
+              else if (screenX > 0.75 * Gdx.graphics.getWidth()) {
                   d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
               }
+              if (screenX > 0.25 * Gdx.graphics.getWidth() && screenX < 0.75 * Gdx.graphics.getWidth() && screenY > 0.5 * Gdx.graphics.getHeight()) {
+                    d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
+              }
+                else if(screenX > 0.25 * Gdx.graphics.getWidth() && screenX < 0.75 * Gdx.graphics.getWidth() && screenY < 0.5 * Gdx.graphics.getHeight()){
+                    d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
+                }
           }
 
     //}

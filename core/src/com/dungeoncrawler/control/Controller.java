@@ -978,15 +978,24 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 create();
                 return true;
         }
-          
-        if(gs != null && gs.getIsLoading() == false){
-            if(screenX < 0.5*Gdx.graphics.getWidth()){
-                d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
-            }
-            if(screenX > 0.5 * Gdx.graphics.getWidth()){
-                d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
-            }
 
+        if(gs == null){
+            mm.cleanUp();
+            mm = null;
+            gs = new GameScreen(d, volume);
+            gs.generateEntitySprites(d.getCurrentEntities());
+            hc = new HudContainer();
+            gs.startLoadingScreen();
+            return true;
+        }
+        else if(gs != null && gs.getIsLoading() == false) {
+              if (screenX < 0.5 * Gdx.graphics.getWidth()) {
+                  d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
+              }
+              if (screenX > 0.5 * Gdx.graphics.getWidth()) {
+                  d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
+              }
+          }
           return true;
         }
     //}

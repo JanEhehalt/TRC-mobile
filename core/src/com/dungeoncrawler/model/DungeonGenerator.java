@@ -351,7 +351,7 @@ public class DungeonGenerator {
                     case 11:
                         //temp = new Healwizard(xPos, yPos, lvl);
                         /*  wird nicht gespawnt
-                        BUG: HP über 100%, also crash in HUD container lol
+                        BUG: HP ueber 100%, also crash in HUD container lol
                         keine Lust zu beheben
                         --TODO--
                         */

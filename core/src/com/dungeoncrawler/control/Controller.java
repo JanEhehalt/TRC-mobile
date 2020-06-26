@@ -901,7 +901,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     @Override
   public boolean touchDown(int screenX, int screenY, int pointer, int button)
   {
-    if(button == Input.Buttons.LEFT){
+    //if(button == Input.Buttons.LEFT){
         switch(click(screenX, screenY)){
             case -1:  // -1: nothing hit -- 0: go ingame -- 1: EXIT game -- 2: goto settings -- 3: goto controls -- 4: goto MainMenuScreen -- 9: volume down -- 10: volume up -- 11: restart game
 
@@ -980,11 +980,16 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         }
           
         if(gs != null && gs.getIsLoading() == false){
-
+            if(screenX < 0.5*Gdx.graphics.getWidth()){
+                d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
+            }
+            if(screenX > 0.5 * Gdx.graphics.getWidth()){
+                d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
+            }
 
           return true;
         }
-    }
+    //}
       return true;
     }
 

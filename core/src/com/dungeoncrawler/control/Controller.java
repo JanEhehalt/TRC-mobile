@@ -11,12 +11,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.dungeoncrawler.view.*;
 import com.dungeoncrawler.model.Dungeon;
 import com.dungeoncrawler.model.DungeonGenerator;
@@ -24,11 +29,20 @@ import com.dungeoncrawler.model.entities.*;
 import com.dungeoncrawler.model.Entity;
 import com.badlogic.gdx.utils.Timer;
 import com.dungeoncrawler.model.ItemContainer;
+import com.sun.org.apache.xpath.internal.operations.Or;
+
 import java.util.ArrayList;
 
 public class Controller extends ApplicationAdapter implements InputProcessor{
     
-    
+    float  GAME_WORLD_WIDTH;
+    float GAME_WORLD_HEIGHT;
+
+    // CAMERA
+    OrthographicCamera camera;
+    Viewport viewport;
+
+
     SpriteBatch batch;
     Dungeon d;
     DungeonGenerator dg;
@@ -75,7 +89,13 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     
     @Override
     public void create(){
-        
+        GAME_WORLD_HEIGHT = 900;
+        GAME_WORLD_WIDTH = 1600;
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+        viewport.apply();
+        camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
+
         checkDoor = true;
         checkDie = true;
         
@@ -302,19 +322,23 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
        
     }
     
-    
+    @Override
+    public void resize(int width, int height){
+        viewport.update(width, height);
+        camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
+    }
+
+
     @Override
     public void render(){
         Gdx.gl.glClearColor(0, 0, 0, 1);
-	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         
         if(end == true){
             if(es == null){
                 isPaused = true;
                 entityMovement.stop();
                 gs.end();
-                gs.getCamera().update();
-                batch.setProjectionMatrix(gs.getCamera().combined);
                 gs = null;
                 hc = null;
                 es = new EndScreen(kills);
@@ -332,7 +356,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
             cs.render(batch);
         }
         if(ps != null){
-            ps.render(batch, volume, gs.getCamera());
+            ps.render(batch, volume, camera);
         }
         
         //PASSIERT IN GAMESCREEN
@@ -357,8 +381,8 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 // Render methode zum rendern der einzelnen Sprites wird aufgerufen
                 if(gs != null){;
                     d.getPlayer().updateItems();
-                    gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY);
                     hc.updateHud(batch, d.getPlayer());
+                    gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY, camera);
                 }
                 
         }
@@ -709,7 +733,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                         d.getPlayer().useItem(d.getPlayer().getInv().getSelected());
                     }
                 }
-                
+                /*
                 if(keycode == Input.Keys.ESCAPE && !end){
                     if(gs != null && gs.getIsLoading() == false && isPaused == false){
                         stop();
@@ -718,7 +742,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                         resume();
                     }
                 }
-                
+                */
                 if(keycode == Input.Keys.LEFT){
                     if(mm != null){}
                     if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
@@ -754,7 +778,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                     if(mm != null){}
                     if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                         Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() + 1, (int) d.getPlayer().getyPos());
-                        
+
                         for(int k = 5; k < d.getCurrentEntities().length; k++){
                             if(d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1){
                                 d.getCurrentEntities()[k] = lol;
@@ -901,13 +925,25 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     @Override
   public boolean touchDown(int screenX, int screenY, int pointer, int button)
   {
-    //if(button == Input.Buttons.LEFT){
+      if(gs == null){
         switch(click(screenX, screenY)){
             case -1:  // -1: nothing hit -- 0: go ingame -- 1: EXIT game -- 2: goto settings -- 3: goto controls -- 4: goto MainMenuScreen -- 9: volume down -- 10: volume up -- 11: restart game
                 break;
             case 0:
                 mm.cleanUp();
                 mm = null;
+                GAME_WORLD_WIDTH = 700;
+                GAME_WORLD_HEIGHT = 380;
+                camera = null;
+                viewport = null;
+                camera = new OrthographicCamera();
+                camera.update();
+                viewport = new FitViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+                viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                viewport.apply();
+                camera.position.set(GAME_WORLD_WIDTH / 2 - 170, GAME_WORLD_HEIGHT / 2 + 20, 0);
+                camera.update();
+                batch.setProjectionMatrix(camera.combined);
                 gs = new GameScreen(d, volume);
                 gs.generateEntitySprites(d.getCurrentEntities());
                 hc = new HudContainer();
@@ -977,31 +1013,33 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 create();
                 break;
         }
+      }
 
-        if(gs == null){
-            mm.cleanUp();
-            mm = null;
-            gs = new GameScreen(d, volume);
-            gs.generateEntitySprites(d.getCurrentEntities());
-            hc = new HudContainer();
-            gs.startLoadingScreen();
-        }
-        else if(gs != null && gs.getIsLoading() == false) {
-              if (screenX < 0.25 * Gdx.graphics.getWidth()) {
-                  d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
-              }
-              else if (screenX > 0.75 * Gdx.graphics.getWidth()) {
-                  d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
-              }
-              if (screenX > 0.25 * Gdx.graphics.getWidth() && screenX < 0.75 * Gdx.graphics.getWidth() && screenY > 0.5 * Gdx.graphics.getHeight()) {
-                    d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
-              }
-                else if(screenX > 0.25 * Gdx.graphics.getWidth() && screenX < 0.75 * Gdx.graphics.getWidth() && screenY < 0.5 * Gdx.graphics.getHeight()){
-                    d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
-                }
+          if(gs != null){
+              switch(gs.click(screenX, screenY)){        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown
+                  case 0:
+                      if(!d.getPlayer().isToDelete()){
+                          d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
+                      }
+                      break;
+                  case 1:
+                      if(!d.getPlayer().isToDelete()){
+                          d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
+                      }
+                      break;
+                  case 2:
+                      if(!d.getPlayer().isToDelete()){
+                          d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
+                      }
+                      break;
+                  case 3:
+                      if(!d.getPlayer().isToDelete()){
+                          d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
+                      }
+                      break;
           }
 
-    //}
+        }
       return true;
     }
 
@@ -1022,19 +1060,53 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
             return cs.click(x, y);
         }
         if(gs != null && isPaused == true){
-        
+            return gs.click(x,y);
         }
         return -1;
     }
   
   
     @Override
-    public boolean touchUp(int i, int i1, int i2, int i3) {
-        return false;
+    public boolean touchUp(int screenX, int screenY, int i2, int i3) {
+        if(gs != null){
+            if(click(screenX,screenY) == 0 || click(screenX,screenY) == 1 || click(screenX,screenY) == 2 || click(screenX,screenY) == 3){
+                        d.getPlayer().setMovementX(0);
+                        d.getPlayer().setMovementY(0);
+                        d.getPlayer().setMovementX(0);
+                        d.getPlayer().setMovementY(0);
+            }
+        }
+        return true;
     }
 
     @Override
-    public boolean touchDragged(int i, int i1, int i2) {
+    public boolean touchDragged(int screenX, int screenY, int i2) {
+        d.getPlayer().setMovementX(0);
+        d.getPlayer().setMovementY(0);
+        d.getPlayer().setMovementX(0);
+        d.getPlayer().setMovementY(0);
+        switch(click(screenX, screenY)){        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown
+            case 0:
+                if(!d.getPlayer().isToDelete()){
+                    d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
+                }
+                break;
+            case 1:
+                if(!d.getPlayer().isToDelete()){
+                    d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
+                }
+                break;
+            case 2:
+                if(!d.getPlayer().isToDelete()){
+                    d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
+                }
+                break;
+            case 3:
+                if(!d.getPlayer().isToDelete()){
+                    d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
+                }
+                break;
+        }
         return false;
     }
 
@@ -1061,13 +1133,36 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         entityMovement.stop();
         gs.stop();
         cs = null;
+        GAME_WORLD_WIDTH = 1600;
+        GAME_WORLD_HEIGHT = 900;
+        camera = null;
+        viewport = null;
+        camera = new OrthographicCamera();
+        camera.update();
+        viewport = new FitViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        viewport.apply();
+        camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
+        camera.update();
         ps = new PauseScreen();
     }
     public void resume(){
+        GAME_WORLD_WIDTH = 700;
+        GAME_WORLD_HEIGHT = 380;
+        camera = null;
+        viewport = null;
+        camera = new OrthographicCamera();
+        camera.update();
+        viewport = new FitViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        viewport.apply();
+        camera.position.set(GAME_WORLD_WIDTH / 2 - 170, GAME_WORLD_HEIGHT / 2 + 20, 0);
+        camera.update();
         isPaused = false;
         entityMovement.start();
         gs.resume();
-        
+
+
         ps = null;
         gs.startLoadingScreen();
     }

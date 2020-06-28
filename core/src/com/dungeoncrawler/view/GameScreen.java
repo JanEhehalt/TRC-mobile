@@ -13,6 +13,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
 import com.dungeoncrawler.model.Dungeon;
 import com.dungeoncrawler.model.Entity;
@@ -39,7 +40,6 @@ public class GameScreen {
         private Map m;
         TiledMapRenderer tmr;
         TiledMap tm;
-        OrthographicCamera camera;
         public ArrayList<AnimatedObject> objects;
         public ArrayList<AnimatedObject> mapItems;
         public ArrayList<AnimatedObject> doors;
@@ -65,6 +65,9 @@ public class GameScreen {
         public Music music;
         
         //Inventory TEST
+
+        // CONTROLS
+        ArrayList<Button> controls;
         
         float animationSpeed = 0.1f;
         
@@ -102,8 +105,6 @@ public class GameScreen {
                 float h = Gdx.graphics.getHeight();
                 
                 m = new Map();
-                camera = new OrthographicCamera(1, h/w);
-                camera.translate(175f, 215f);
                 
                 
                 Texture[] tempTextures = new Texture[d.getLevel().length];
@@ -175,10 +176,19 @@ public class GameScreen {
                        }
                     }
                 },0, 0.03f);
+
+                // CONTROLS
+                    controls = new ArrayList();
+                    int hudX = -170;
+                    int hudY = 20;
+                    controls.add(new Button("sprites/controls/arrowLeft.png", hudX + 0, hudY + 50, 0));
+                    controls.add(new Button("sprites/controls/arrowUp.png", hudX + 50, hudY + 100, 1));
+                    controls.add(new Button("sprites/controls/arrowRight.png", hudX + 100, hudY + 50, 2));
+                    controls.add(new Button("sprites/controls/arrowDown.png", hudX + 50, hudY + 0, 3));
                 
 	}
 
-	public void render (SpriteBatch batch, Player p, Entity[] e, int tileX, int tileY, int level, int roomPosX, int roomPosY) {
+	public void render (SpriteBatch batch, Player p, Entity[] e, int tileX, int tileY, int level, int roomPosX, int roomPosY, OrthographicCamera camera) {
 
             entities = e;
             
@@ -209,10 +219,6 @@ public class GameScreen {
             //MAP
             tmr.setView(camera);
             tmr.render();
-            
-            camera.zoom = 700f; // Standart 700f
-            camera.update();
-            batch.setProjectionMatrix(camera.combined);
             
             updateEntitySprites(e);
         
@@ -265,6 +271,10 @@ public class GameScreen {
                     String text = ""+dmgContainer[x].getValue();
                     font.draw(batch, text, dmgContainer[x].getCurrentX(), dmgContainer[x].getCurrentY());
                 }
+            }
+
+            for(Button button : controls){
+                button.getSprite().draw(batch);
             }
             
             batch.end();
@@ -496,20 +506,14 @@ public class GameScreen {
         }
         
         public void stop(){
-            camera.zoom = 1600;
-            camera.translate(625f, 241f);
             animations.stop();
             animatePlayer.stop();
         }
         public void resume(){
-            camera.zoom = 700;
-            camera.translate(-625f, -241f);
             animations.start();
             animatePlayer.start();
         }
         public void end(){
-            camera.zoom = 1600;
-            camera.translate(625f, 241f);
             animations.stop();
             animatePlayer.stop();
             cleanUp();
@@ -523,8 +527,15 @@ public class GameScreen {
                 }
             }
         }
-        public OrthographicCamera getCamera(){
-            return camera;
+        public int click(int x, int y){
+            x = (int)((float)x / (float)Gdx.graphics.getWidth() * 1600f) - 170;
+            y = 900-(int)((float)y / Gdx.graphics.getHeight() * 900);
+            Rectangle mouse = new Rectangle(x,y,1,1);
+            for(Button button : controls){
+                if(Intersector.overlaps(mouse, button.getSprite().getBoundingRectangle())){
+                    return button.getId();
+                }
+            }
+            return -1;
         }
-       
 }

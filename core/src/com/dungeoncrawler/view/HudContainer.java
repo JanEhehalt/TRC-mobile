@@ -233,4 +233,20 @@ public class HudContainer {
     public void setSelected(int i){
             selected = i;
     }
+
+    public float getHudPosX() {
+        return HudPosX;
+    }
+
+    public void setHudPosX(float hudPosX) {
+        HudPosX = hudPosX;
+    }
+
+    public float getHudPosY() {
+        return HudPosY;
+    }
+
+    public void setHudPosY(float hudPosY) {
+        HudPosY = hudPosY;
+    }
 }

@@ -179,8 +179,8 @@ public class GameScreen {
 
                 // CONTROLS
                     controls = new ArrayList();
-                    int hudX = -170;
-                    int hudY = 20;
+                    int hudX = -160;
+                    int hudY = 25;
                     controls.add(new Button("sprites/controls/arrowLeft.png", hudX + 0, hudY + 50, 0));
                     controls.add(new Button("sprites/controls/arrowUp.png", hudX + 50, hudY + 100, 1));
                     controls.add(new Button("sprites/controls/arrowRight.png", hudX + 100, hudY + 50, 2));
@@ -528,8 +528,9 @@ public class GameScreen {
             }
         }
         public int click(int x, int y){
-            x = (int)((float)x / (float)Gdx.graphics.getWidth() * 1600f) - 170;
-            y = 900-(int)((float)y / Gdx.graphics.getHeight() * 900);
+            x = (int)((float)x / (float)Gdx.graphics.getWidth() * 1600f) - 160;
+            y = 900-(int)((float)y / Gdx.graphics.getHeight() * 900) + 25;
+            System.out.println("X: "+x+"| Y: "+y);
             Rectangle mouse = new Rectangle(x,y,1,1);
             for(Button button : controls){
                 if(Intersector.overlaps(mouse, button.getSprite().getBoundingRectangle())){

@@ -18,9 +18,7 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.dungeoncrawler.view.*;
 import com.dungeoncrawler.model.Dungeon;
@@ -29,7 +27,6 @@ import com.dungeoncrawler.model.entities.*;
 import com.dungeoncrawler.model.Entity;
 import com.badlogic.gdx.utils.Timer;
 import com.dungeoncrawler.model.ItemContainer;
-import com.sun.org.apache.xpath.internal.operations.Or;
 
 import java.util.ArrayList;
 
@@ -1016,28 +1013,22 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
       }
 
           if(gs != null){
-              switch(gs.click(screenX, screenY)){        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown
-                  case 0:
-                      if(!d.getPlayer().isToDelete()){
-                          d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
-                      }
-                      break;
-                  case 1:
-                      if(!d.getPlayer().isToDelete()){
-                          d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
-                      }
-                      break;
-                  case 2:
-                      if(!d.getPlayer().isToDelete()){
-                          d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
-                      }
-                      break;
-                  case 3:
-                      if(!d.getPlayer().isToDelete()){
-                          d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
-                      }
-                      break;
-          }
+            if(!d.getPlayer().isToDelete()){
+                switch(gs.click(screenX, screenY)){        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown
+                    case 0:
+                            d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
+                        break;
+                    case 1:
+                            d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
+                        break;
+                    case 2:
+                            d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
+                        break;
+                    case 3:
+                            d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
+                        break;
+                }
+            }
 
         }
       return true;

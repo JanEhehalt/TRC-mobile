@@ -2,6 +2,7 @@ package com.dungeoncrawler.view;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Rectangle;
 
 public class Button {
 
@@ -11,9 +12,11 @@ public class Button {
     int width;
     int height;
     int id;
+    private Rectangle rect;
 
     public Button(String texture, int x, int y, int id) {
         this.sprite = new Sprite(new Texture(texture));
+        rect = sprite.getBoundingRectangle();
         this.xPos = x;
         this.yPos = y;
         this.width = (int) sprite.getWidth();
@@ -69,5 +72,19 @@ public class Button {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    /**
+     * @return the rect
+     */
+    public Rectangle getRect() {
+        return rect;
+    }
+
+    /**
+     * @param rect the rect to set
+     */
+    public void setRect(Rectangle rect) {
+        this.rect = rect;
     }
 }

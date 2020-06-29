@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -18,6 +19,8 @@ import com.badlogic.gdx.utils.Timer;
 import com.dungeoncrawler.model.Dungeon;
 import com.dungeoncrawler.model.Entity;
 import com.dungeoncrawler.model.entities.*;
+
+import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -68,6 +71,8 @@ public class GameScreen {
 
         // CONTROLS
         ArrayList<Button> controls;
+        int mouseX;
+        int mouseY;
         
         float animationSpeed = 0.1f;
         
@@ -185,6 +190,10 @@ public class GameScreen {
                     controls.add(new Button("sprites/controls/arrowUp.png", hudX + 50, hudY + 100, 1));
                     controls.add(new Button("sprites/controls/arrowRight.png", hudX + 100, hudY + 50, 2));
                     controls.add(new Button("sprites/controls/arrowDown.png", hudX + 50, hudY + 0, 3));
+                    controls.add(new Button("sprites/controls/arrowLeft.png", 550-170, 75, 4));
+                    controls.add(new Button("sprites/controls/arrowUp.png", 600-170, 125, 5));
+                    controls.add(new Button("sprites/controls/arrowRight.png", 650-170, 75, 6));
+                    controls.add(new Button("sprites/controls/arrowDown.png", 600-170, 25, 7));
                 
 	}
 
@@ -278,6 +287,18 @@ public class GameScreen {
             }
             
             batch.end();
+
+            // BUTTON HITBOXES
+            /*
+            ShapeRenderer lol = new ShapeRenderer();
+            lol.setProjectionMatrix(camera.combined);
+            lol.begin(ShapeRenderer.ShapeType.Filled);
+            for(Button button : controls){
+                lol.rect(button.getxPos(), button.getyPos(), button.getWidth(), button.getHeight());
+            }
+            lol.circle(mouseX,mouseY,5);
+            lol.end();
+            */
 	}
         
         public void generateEntitySprites(Entity[] e){
@@ -528,12 +549,15 @@ public class GameScreen {
             }
         }
         public int click(int x, int y){
-            x = (int)((float)x / (float)Gdx.graphics.getWidth() * 1600f) - 160;
-            y = 900-(int)((float)y / Gdx.graphics.getHeight() * 900) + 25;
+            x = (int)(((float)x) / (float)Gdx.graphics.getWidth() * 700f) -170;
+            y = 380- (int)(((float)y) / (float)Gdx.graphics.getHeight() * 380f)+ 25;
+            mouseX = x;
+            mouseY = y;
             System.out.println("X: "+x+"| Y: "+y);
             Rectangle mouse = new Rectangle(x,y,1,1);
             for(Button button : controls){
                 if(Intersector.overlaps(mouse, button.getSprite().getBoundingRectangle())){
+                    System.out.println(button.getId());
                     return button.getId();
                 }
             }

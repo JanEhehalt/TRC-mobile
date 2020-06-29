@@ -1019,13 +1019,70 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
                         break;
                     case 1:
-                            d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
+                            d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
                         break;
                     case 2:
-                            d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
+                            d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
                         break;
                     case 3:
-                            d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
+                            d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
+                        break;
+                    case 4:
+                        if(!gs.getIsLoading() && !d.getPlayer().isToDelete()){
+                            Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() - 1, (int) d.getPlayer().getyPos());
+
+                            for(int k = 5; k < d.getCurrentEntities().length; k++){
+                                if(d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1){
+                                    d.getCurrentEntities()[k] = lol;
+                                    gs.generateNewEntitySprite(lol, k);
+                                    gs.player.startSecondaryAttack();
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                
+                    case 5:
+                        if(!gs.getIsLoading() && !d.getPlayer().isToDelete()){
+                            Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() + 1);
+
+                            for(int k = 5; k < d.getCurrentEntities().length; k++){
+                                if(d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1){
+                                    d.getCurrentEntities()[k] = lol;
+                                    gs.generateNewEntitySprite(lol, k);
+                                    gs.player.startSecondaryAttack();
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case 6:
+                        if(!gs.getIsLoading() && !d.getPlayer().isToDelete()){
+                            Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() + 1, (int) d.getPlayer().getyPos());
+
+                            for(int k = 5; k < d.getCurrentEntities().length; k++){
+                                if(d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1){
+                                    d.getCurrentEntities()[k] = lol;
+                                    gs.generateNewEntitySprite(lol, k);
+                                    gs.player.startSecondaryAttack();
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case 7:
+                        if(!gs.getIsLoading() && !d.getPlayer().isToDelete()){
+                            Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() - 1);
+
+                            for(int k = 5; k < d.getCurrentEntities().length; k++){
+                                if(d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1){
+                                    d.getCurrentEntities()[k] = lol;
+                                    gs.generateNewEntitySprite(lol, k);
+                                    gs.player.startSecondaryAttack();
+                                    break;
+                                }
+                            }
+                        }
                         break;
                 }
             }
@@ -1060,7 +1117,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     @Override
     public boolean touchUp(int screenX, int screenY, int i2, int i3) {
         if(gs != null){
-            if(click(screenX,screenY) == 0 || click(screenX,screenY) == 1 || click(screenX,screenY) == 2 || click(screenX,screenY) == 3){
+            if(gs.click(screenX,screenY) == 0 || gs.click(screenX,screenY) == 1 || gs.click(screenX,screenY) == 2 || gs.click(screenX,screenY) == 3){
                         d.getPlayer().setMovementX(0);
                         d.getPlayer().setMovementY(0);
                         d.getPlayer().setMovementX(0);
@@ -1072,10 +1129,10 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int i2) {
-        d.getPlayer().setMovementX(0);
-        d.getPlayer().setMovementY(0);
-        d.getPlayer().setMovementX(0);
-        d.getPlayer().setMovementY(0);
+        //d.getPlayer().setMovementX(0);
+        //d.getPlayer().setMovementY(0);
+        //d.getPlayer().setMovementX(0);
+        //d.getPlayer().setMovementY(0);
         switch(click(screenX, screenY)){        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown
             case 0:
                 if(!d.getPlayer().isToDelete()){
@@ -1095,6 +1152,63 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
             case 3:
                 if(!d.getPlayer().isToDelete()){
                     d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
+                }
+                break;
+            case 4:
+                if(!gs.getIsLoading() && !d.getPlayer().isToDelete()){
+                    Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() - 1, (int) d.getPlayer().getyPos());
+
+                    for(int k = 5; k < d.getCurrentEntities().length; k++){
+                        if(d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1){
+                            d.getCurrentEntities()[k] = lol;
+                            gs.generateNewEntitySprite(lol, k);
+                            gs.player.startSecondaryAttack();
+                            break;
+                        }
+                    }
+                }
+                break;
+
+            case 5:
+                if(!gs.getIsLoading() && !d.getPlayer().isToDelete()){
+                    Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() + 1);
+
+                    for(int k = 5; k < d.getCurrentEntities().length; k++){
+                        if(d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1){
+                            d.getCurrentEntities()[k] = lol;
+                            gs.generateNewEntitySprite(lol, k);
+                            gs.player.startSecondaryAttack();
+                            break;
+                        }
+                    }
+                }
+                break;
+            case 6:
+                if(!gs.getIsLoading() && !d.getPlayer().isToDelete()){
+                    Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() + 1, (int) d.getPlayer().getyPos());
+
+                    for(int k = 5; k < d.getCurrentEntities().length; k++){
+                        if(d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1){
+                            d.getCurrentEntities()[k] = lol;
+                            gs.generateNewEntitySprite(lol, k);
+                            gs.player.startSecondaryAttack();
+                            break;
+                        }
+                    }
+                }
+                break;
+            case 7:
+                if(!gs.getIsLoading() && !d.getPlayer().isToDelete()){
+                    Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() - 1);
+
+                    for(int k = 5; k < d.getCurrentEntities().length; k++){
+                        if(d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1){
+                            d.getCurrentEntities()[k] = lol;
+                            gs.generateNewEntitySprite(lol, k);
+                            gs.player.startSecondaryAttack();
+                            break;
+                        }
+                    }
                 }
                 break;
         }

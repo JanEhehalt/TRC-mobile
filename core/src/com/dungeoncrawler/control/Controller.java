@@ -1098,6 +1098,49 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                                 }
                             }
                             break;
+                        case 8:
+                            // pickUp
+                            if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
+                                if(!d.getPlayer().inventoryFull()){
+                                    ArrayList<ItemContainer> garbage = playerPickUp();
+
+                                    for(ItemContainer item : garbage){
+                                        d.getPlayer().getInv().addItem(item.getItem());
+                                    }
+                                }
+                            }
+                            break;
+                        case 9:
+                            // equip1
+                            if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().equipSlot(0);
+                                d.getPlayer().updateItems();
+                            }
+                            break;
+                        case 10:
+                            // drop
+                            if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
+                                if(d.getPlayer().getInv().getItem(d.getPlayer().getInv().getSelected()) != null){
+                                    d.getCurrentRoom().spawnItem((int)d.getPlayer().getxPos(), (int)d.getPlayer().getyPos(), d.getPlayer().getInv().getItem(d.getPlayer().getInv().getSelected()));
+                                    gs.getM().getMaps()[level][roomPosX][roomPosY].addItem(48, 48,(int)d.getPlayer().getxPos(), (int)d.getPlayer().getyPos(), d.getPlayer().getInv().getItem(d.getPlayer().getInv().getSelected()));
+                                    d.getPlayer().getInv().dropItem();
+                                    d.getPlayer().updateItems();
+                                }
+                            }
+                            break;
+                        case 11:
+                            // equip2
+                            if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().equipSlot(1);
+                                d.getPlayer().updateItems();
+                            }
+                            break;
+                        case 12:
+                            // use
+                            if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
+                                d.getPlayer().useItem(d.getPlayer().getInv().getSelected());
+                            }
+                            break;
                     }
                 }
             }

@@ -18,7 +18,7 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.dungeoncrawler.view.*;
 import com.dungeoncrawler.model.Dungeon;
@@ -89,7 +89,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         GAME_WORLD_HEIGHT = 900;
         GAME_WORLD_WIDTH = 1600;
         camera = new OrthographicCamera();
-        viewport = new FitViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+        viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
         viewport.apply();
         camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
 
@@ -342,7 +342,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 viewport = null;
                 camera = new OrthographicCamera();
                 camera.update();
-                viewport = new FitViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+                viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
                 viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 viewport.apply();
                 camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
@@ -947,7 +947,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 viewport = null;
                 camera = new OrthographicCamera();
                 camera.update();
-                viewport = new FitViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+                viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
                 viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 viewport.apply();
                 camera.position.set(GAME_WORLD_WIDTH / 2 - 170, GAME_WORLD_HEIGHT / 2 + 20, 0);
@@ -1028,7 +1028,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
             if(!d.getPlayer().isToDelete()) {
                 ArrayList<Integer> clicked = gs.click(screenX,screenY);
                 for (Integer i : clicked) {
-                    switch (i) {        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown
+                    switch (i) {        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown, 8: pickUp
                         case 0:
                             d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
                             break;
@@ -1138,10 +1138,13 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int i2) {
-        d.getPlayer().setMovementX(0);
-        d.getPlayer().setMovementY(0);
+
         if(gs != null){
             if(!d.getPlayer().isToDelete()) {
+                if(gs.click(screenX,screenY).contains(0) || gs.click(screenX,screenY).contains(1)|| gs.click(screenX,screenY).contains(2)|| gs.click(screenX,screenY).contains(3)){
+                    d.getPlayer().setMovementX(0);
+                    d.getPlayer().setMovementY(0);
+                }
                 ArrayList<Integer> clicked = gs.click(screenX,screenY);
                 for (Integer i : clicked) {
                     switch (i) {        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown
@@ -1250,7 +1253,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         viewport = null;
         camera = new OrthographicCamera();
         camera.update();
-        viewport = new FitViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+        viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         viewport.apply();
         camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
@@ -1264,7 +1267,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         viewport = null;
         camera = new OrthographicCamera();
         camera.update();
-        viewport = new FitViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+        viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
         viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         viewport.apply();
         camera.position.set(GAME_WORLD_WIDTH / 2 - 170, GAME_WORLD_HEIGHT / 2 + 20, 0);

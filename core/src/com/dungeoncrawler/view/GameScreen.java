@@ -195,7 +195,11 @@ public class GameScreen {
                     controls.add(new Button("sprites/controls/arrowUp.png", 600-170, 125, 5));
                     controls.add(new Button("sprites/controls/arrowRight.png", 650-170, 75, 6));
                     controls.add(new Button("sprites/controls/arrowDown.png", 600-170, 25, 7));
-                    controls.add(new Button("sprites/controls/pickUp.png", 200, 30, 8));
+                    controls.add(new Button("sprites/controls/pickUp.png", 160-110, 30, 8));
+                    controls.add(new Button("sprites/controls/equip1.png", 160-110, 120, 9));
+                    controls.add(new Button("sprites/controls/drop.png", 160+110, 30, 10));
+                    controls.add(new Button("sprites/controls/equip2.png", 160+110, 120, 11));
+                    controls.add(new Button("sprites/controls/use.png", 600-170, 200, 12));
                 
 	}
 

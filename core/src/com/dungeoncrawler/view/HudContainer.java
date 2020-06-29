@@ -64,10 +64,10 @@ public class HudContainer {
         HudPosY = HudSprite.getY();
         
         playerHealthX = HudPosX+36f;
-        playerHealthY = HudPosY+260f;
+        playerHealthY = HudPosY+347f;
         
-        healthBarContainer.setPosition(HudPosX + 8,HudPosY + 252);
-        Inventory.setPosition(HudPosX + 7,HudPosY + 7);
+        healthBarContainer.setPosition(HudPosX + 8,HudPosY + 339);
+        Inventory.setPosition(HudPosX + 7,HudPosY + 170);
         
         float InvX = Inventory.getX();
         float InvY = Inventory.getY();

@@ -295,7 +295,7 @@ public class GameScreen {
             batch.end();
 
             // BUTTON HITBOXES
-
+/*
             ShapeRenderer lol = new ShapeRenderer();
             lol.setProjectionMatrix(camera.combined);
             lol.begin(ShapeRenderer.ShapeType.Filled);
@@ -304,6 +304,8 @@ public class GameScreen {
             }
             lol.circle(mouseX,mouseY,15);
             lol.end();
+
+ */
 
 	}
         

@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
@@ -289,16 +290,16 @@ public class GameScreen {
             batch.end();
 
             // BUTTON HITBOXES
-            /*
+
             ShapeRenderer lol = new ShapeRenderer();
             lol.setProjectionMatrix(camera.combined);
             lol.begin(ShapeRenderer.ShapeType.Filled);
             for(Button button : controls){
                 lol.rect(button.getxPos(), button.getyPos(), button.getWidth(), button.getHeight());
             }
-            lol.circle(mouseX,mouseY,5);
+            lol.circle(mouseX,mouseY,15);
             lol.end();
-            */
+
 	}
         
         public void generateEntitySprites(Entity[] e){
@@ -548,19 +549,18 @@ public class GameScreen {
                 }
             }
         }
-        public int click(int x, int y){
+        public ArrayList<Integer> click(int x, int y){
             x = (int)(((float)x) / (float)Gdx.graphics.getWidth() * 700f) -170;
             y = 380- (int)(((float)y) / (float)Gdx.graphics.getHeight() * 380f)+ 25;
             mouseX = x;
             mouseY = y;
-            System.out.println("X: "+x+"| Y: "+y);
-            Rectangle mouse = new Rectangle(x,y,1,1);
+            ArrayList<Integer> clicks = new ArrayList();
+            Circle mouse = new Circle(x,y,20);
             for(Button button : controls){
                 if(Intersector.overlaps(mouse, button.getSprite().getBoundingRectangle())){
-                    System.out.println(button.getId());
-                    return button.getId();
+                    clicks.add(button.getId());
                 }
             }
-            return -1;
+            return clicks;
         }
 }

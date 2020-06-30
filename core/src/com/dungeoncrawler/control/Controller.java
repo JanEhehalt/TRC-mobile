@@ -565,6 +565,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 roomPosY = roomAmount / 2;
 
                 d.initVisited(roomAmount);
+                d.updateVisited(roomPosX, roomPosY);
             }
             else{ // Dungeon Exit
                 end = true;
@@ -1234,11 +1235,11 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         if(gs != null){
             if(!d.getPlayer().isToDelete()) {
 
-                if(!gs.click(screenX,screenY).contains(0) &&  !gs.click(screenX,screenY).contains(2)){
+                if(!gs.click(screenX,screenY).contains(0) || !gs.click(screenX,screenY).contains(2)){
                     d.getPlayer().setMovementX(0);
                 }
 
-                if(!gs.click(screenX,screenY).contains(1) &&!gs.click(screenX,screenY).contains(3)){
+                if(!gs.click(screenX,screenY).contains(1) || !gs.click(screenX,screenY).contains(3)){
                     d.getPlayer().setMovementY(0);
                 }
                 ArrayList<Integer> clicked = gs.click(screenX,screenY);

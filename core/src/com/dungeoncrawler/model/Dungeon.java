@@ -132,22 +132,30 @@ public class Dungeon {
 
         // left
         if(roomX > 0 && currentLevel.getRooms()[roomX - 1][roomY] != null){
-            isVisited[roomX - 1][roomY] = 1;
+            if(isVisited[roomX - 1][roomY] != 2) {
+                isVisited[roomX - 1][roomY] = 1;
+            }
         }
 
         // right
         if(roomX < currentLevel.getRooms().length - 1 && currentLevel.getRooms()[roomX + 1][roomY] != null){
-            isVisited[roomX + 1][roomY] = 1;
+            if(isVisited[roomX + 1][roomY] != 2) {
+                isVisited[roomX + 1][roomY] = 1;
+            }
         }
 
         // top
         if(roomY > 0 && currentLevel.getRooms()[roomX][roomY - 1] != null){
-            isVisited[roomX][roomY - 1] = 1;
+            if(isVisited[roomX][roomY - 1] != 2) {
+                isVisited[roomX][roomY - 1] = 1;
+            }
         }
 
         // bottom
         if(roomY < currentLevel.getRooms().length - 1 && currentLevel.getRooms()[roomX][roomY + 1] != null){
-            isVisited[roomX][roomY + 1] = 1;
+            if(isVisited[roomX][roomY + 1] != 2) {
+                isVisited[roomX][roomY + 1] = 1;
+            }
         }
     }
     

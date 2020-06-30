@@ -51,6 +51,14 @@ public class GameScreen {
 
         // MiniMap
         ShapeRenderer shapeRenderer;
+        Sprite miniMapContainer;
+
+        int mapX = 10;
+        int mapY = 310;
+        int gap = 2;
+        int rectWidth = 15;
+        int rectHeight = 10;
+        float alpha = 0.5f;
         
         Timer animations;
         Timer animatePlayer;
@@ -128,6 +136,8 @@ public class GameScreen {
                 mg.ichWillSpielen(m.getMaps());
 
                 shapeRenderer = new ShapeRenderer();
+                miniMapContainer = new Sprite(new Texture(Gdx.files.internal("sprites/miniMapContainer.png")));
+                miniMapContainer.setPosition(mapX - 10, mapY - 20);
                 
                 tm = new TiledMap();
                 tmr = new OrthogonalTiledMapRenderer(tm);
@@ -225,6 +235,7 @@ public class GameScreen {
             entities = e;
             
             this.p = p;
+
             
             //playerMoving = (p.getMovementX() != 0 || p.getMovementY() != 0);
 
@@ -308,17 +319,14 @@ public class GameScreen {
             for(Button button : controls){
                 button.getSprite().draw(batch);
             }
+
+            miniMapContainer.draw(batch);
             
             batch.end();
 
-            int mapX = 10;
-            int mapY = 320;
-            int gap = 2;
-            int rectWidth = 15;
-            int rectHeight = 10;
-
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 
             for(int i = 0; i < miniMap.length; i++){
@@ -326,23 +334,24 @@ public class GameScreen {
 
                     // current Room
                     if(i == roomPosX && j == roomPosY){
-                        shapeRenderer.setColor(Color.GREEN);
+                        shapeRenderer.setColor(0, 0.75f, 0, alpha);
                     }
                     // not found
                     else if(miniMap[i][j] == 0){
-                        shapeRenderer.setColor(Color.WHITE);
+                        shapeRenderer.setColor(0, 0, 0, alpha);
                     }
                     // found
                     else if(miniMap[i][j] == 1){
-                        shapeRenderer.setColor(Color.DARK_GRAY);
+                        shapeRenderer.setColor(0.2f, 0.2f, 0.2f, alpha);
                     }
                     // visited
                     else if(miniMap[i][j] == 2){
-                        shapeRenderer.setColor(Color.LIGHT_GRAY);
+                        shapeRenderer.setColor(0.5f, 0.5f, 0.5f, alpha);
                     }
 
-                    if(miniMap[i][j] != 0 || true) {
+                    if(miniMap[i][j] != 0) {
                         shapeRenderer.rect(i * gap + i * rectWidth + mapX, j * gap + j * rectHeight + mapY, rectWidth, rectHeight);
+                        shapeRenderer.setColor(Color.RED);
                     }
                 }
             }

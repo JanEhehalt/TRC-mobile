@@ -317,8 +317,10 @@ public class GameScreen {
             int rectWidth = 15;
             int rectHeight = 10;
 
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            
+
             for(int i = 0; i < miniMap.length; i++){
                 for(int j = 0; j < miniMap.length; j++){
 
@@ -345,6 +347,7 @@ public class GameScreen {
                 }
             }
             shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
 
             // BUTTON HITBOXES
 /*

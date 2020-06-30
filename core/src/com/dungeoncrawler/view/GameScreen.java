@@ -200,6 +200,15 @@ public class GameScreen {
                     controls.add(new Button("sprites/controls/drop.png", 160+110, 30, 10));
                     controls.add(new Button("sprites/controls/equip2.png", 160+110, 120, 11));
                     controls.add(new Button("sprites/controls/use.png", 600-170, 200, 12));
+                    // INVENTORY
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -118, 334, 20));      //0
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -69, 334, 21));       //1
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -144, 282, 22));      //2
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -92, 282, 23));       //3
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -42, 282, 24));       //4
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -144, 231, 25));      //5
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -92, 231, 26));       //6
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -42, 231, 27));       //7
                 
 	}
 
@@ -304,8 +313,8 @@ public class GameScreen {
             }
             lol.circle(mouseX,mouseY,15);
             lol.end();
+*/
 
- */
 
 	}
         

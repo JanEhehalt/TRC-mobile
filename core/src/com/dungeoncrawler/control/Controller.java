@@ -1021,6 +1021,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
             case 11:
                 create();
                 break;
+
         }
       }
 
@@ -1141,6 +1142,46 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                                 d.getPlayer().useItem(d.getPlayer().getInv().getSelected());
                             }
                             break;
+                        case 20:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(0);
+                            }
+                            break;
+                        case 21:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(1);
+                            }
+                            break;
+                        case 22:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(2);
+                            }
+                            break;
+                        case 23:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(3);
+                            }
+                            break;
+                        case 24:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(4);
+                            }
+                            break;
+                        case 25:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(5);
+                            }
+                            break;
+                        case 26:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(6);
+                            }
+                            break;
+                        case 27:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(7);
+                            }
+                            break;
                     }
                 }
             }
@@ -1184,8 +1225,12 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
 
         if(gs != null){
             if(!d.getPlayer().isToDelete()) {
-                if(gs.click(screenX,screenY).contains(0) || gs.click(screenX,screenY).contains(1)|| gs.click(screenX,screenY).contains(2)|| gs.click(screenX,screenY).contains(3)){
+
+                if(!gs.click(screenX,screenY).contains(0) &&  !gs.click(screenX,screenY).contains(2)){
                     d.getPlayer().setMovementX(0);
+                }
+
+                if(!gs.click(screenX,screenY).contains(1) &&!gs.click(screenX,screenY).contains(3)){
                     d.getPlayer().setMovementY(0);
                 }
                 ArrayList<Integer> clicked = gs.click(screenX,screenY);

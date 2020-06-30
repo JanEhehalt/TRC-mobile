@@ -28,6 +28,8 @@ public class HudContainer {
     Sprite playerHealthSprite;
     float playerHealthX;
     float playerHealthY;
+
+    Sprite textboxSprite;
     
     BitmapFont font;
     float HudPosX;
@@ -51,6 +53,8 @@ public class HudContainer {
         InventoryItemSprites = new Sprite[8];
         invXPos = new float[8];
         invYPos = new float[8];
+        textboxSprite = new Sprite(new Texture("sprites/textbox.png"));
+        textboxSprite.setPosition(HudSprite.getX() + 21, HudSprite.getY() + 148);
         
         Texture inv = new Texture("sprites/hudInventory.png");
         Inventory = new Sprite(inv);
@@ -64,10 +68,10 @@ public class HudContainer {
         HudPosY = HudSprite.getY();
         
         playerHealthX = HudPosX+36f;
-        playerHealthY = HudPosY+347f;
+        playerHealthY = HudPosY+357f;
         
-        healthBarContainer.setPosition(HudPosX + 8,HudPosY + 339);
-        Inventory.setPosition(HudPosX + 7,HudPosY + 170);
+        healthBarContainer.setPosition(HudPosX + 8,HudPosY + 349);
+        Inventory.setPosition(HudPosX + 7,HudPosY + 190);   // 140  215
         
         float InvX = Inventory.getX();
         float InvY = Inventory.getY();
@@ -150,6 +154,7 @@ public class HudContainer {
                 }
             selectedSprite.draw(batch);
             playerHealthSprite.draw(batch);
+            textboxSprite.draw(batch);
             font.draw(batch, p.getHp() + " / " + p.getMaxhp(), playerHealthSprite.getX()+18, playerHealthSprite.getY()+14);
             if(items[selected] != null){
                 
@@ -179,8 +184,9 @@ public class HudContainer {
                         break;
                 
                 }
-                font.draw(batch, selectedName + lvl, HudPosX + 40, HudPosY + 210);
-                font.draw(batch, perk + selectedPerkValue, HudPosX + 40, HudPosY + 190);
+
+                font.draw(batch, selectedName + lvl, HudPosX + 40, HudPosY + 184);
+                font.draw(batch, perk + selectedPerkValue, HudPosX + 40, HudPosY + 164);
             }
             
             

@@ -2,6 +2,7 @@ package com.dungeoncrawler.view;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -47,6 +48,9 @@ public class GameScreen {
         public ArrayList<AnimatedObject> objects;
         public ArrayList<AnimatedObject> mapItems;
         public ArrayList<AnimatedObject> doors;
+
+        // MiniMap
+        ShapeRenderer shapeRenderer;
         
         Timer animations;
         Timer animatePlayer;
@@ -122,6 +126,8 @@ public class GameScreen {
                 
                 m = mg.generateMap(d);
                 mg.ichWillSpielen(m.getMaps());
+
+                shapeRenderer = new ShapeRenderer();
                 
                 tm = new TiledMap();
                 tmr = new OrthogonalTiledMapRenderer(tm);
@@ -212,7 +218,9 @@ public class GameScreen {
                 
 	}
 
-	public void render (SpriteBatch batch, Player p, Entity[] e, int tileX, int tileY, int level, int roomPosX, int roomPosY, OrthographicCamera camera) {
+	public void render (SpriteBatch batch, Player p, Entity[] e, int tileX, int tileY, int level, int roomPosX, int roomPosY, OrthographicCamera camera, int[][] miniMap) {
+
+            shapeRenderer.setProjectionMatrix(camera.combined);
 
             entities = e;
             
@@ -302,6 +310,44 @@ public class GameScreen {
             }
             
             batch.end();
+
+            int mapX = 10;
+            int mapY = 320;
+            int gap = 2;
+            int rectWidth = 15;
+            int rectHeight = 10;
+
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+            for(int i = 0; i < miniMap.length; i++){
+                for(int j = 0; j < miniMap.length; j++){
+
+                    // current Room
+                    if(i == roomPosX && j == roomPosY){
+                        shapeRenderer.setColor(Color.GREEN);
+                    }
+                    // not found
+                    else if(miniMap[i][j] == 0){
+                        shapeRenderer.setColor(Color.WHITE);
+                    }
+                    // found
+                    else if(miniMap[i][j] == 1){
+                        shapeRenderer.setColor(Color.DARK_GRAY);
+                    }
+                    // visited
+                    else if(miniMap[i][j] == 2){
+                        shapeRenderer.setColor(Color.LIGHT_GRAY);
+                    }
+
+                    if(miniMap[i][j] != 0 || true) {
+                        shapeRenderer.rect(i * gap + i * rectWidth + mapX, j * gap + j * rectHeight + mapY, rectWidth, rectHeight);
+                    }
+                }
+            }
+            shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
 
             // BUTTON HITBOXES
 /*

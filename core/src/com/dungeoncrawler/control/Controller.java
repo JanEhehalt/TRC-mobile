@@ -133,6 +133,9 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         d.setCurrentRoom(d.getCurrentLevel().getRooms()[roomPosX][roomPosY]);
         d.setCurrentEntities(d.getCurrentRoom().getEnemies());
 
+        d.initVisited(roomAmount);
+        d.updateVisited(roomPosX, roomPosY);
+
         Gdx.input.setInputProcessor(this);
         
         
@@ -391,7 +394,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 if(gs != null){;
                     d.getPlayer().updateItems();
                     hc.updateHud(batch, d.getPlayer());
-                    gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY, camera);
+                    gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY, camera, d.getVisited());
                 }
                 
         }
@@ -560,16 +563,21 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 int roomAmount = d.getLevel()[level].getRooms().length;
                 roomPosX = roomAmount / 2;
                 roomPosY = roomAmount / 2;
+
+                d.initVisited(roomAmount);
             }
             else{ // Dungeon Exit
                 end = true;
                 return;
             }
         }
+
+        d.updateVisited(roomPosX, roomPosY);
         
         d.setCurrentLevel(d.getLevel()[level]);
         d.setCurrentRoom(d.getCurrentLevel().getRooms()[roomPosX][roomPosY]);
         d.setCurrentEntities(d.getCurrentRoom().getEnemies());
+
         
         gs.generateEntitySprites(d.getCurrentEntities());
         

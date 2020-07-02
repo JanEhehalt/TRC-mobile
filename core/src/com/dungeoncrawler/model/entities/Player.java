@@ -51,12 +51,12 @@ public class Player extends Entity {
     
     public void updateStats(int ey){
         this.lvl = ey+1;
-        this.level = (exp / 10) + 1;
+        this.level = (this.exp / 10) + 1;
         this.maxhp = 50 * this.level;
         this.standartMaxHp = 50 * this.level;
         this.standartDmg = 20 * this.level;
         this.dmg = this.standartDmg;
-        this.standartDef = 4 * level;
+        this.standartDef = 4 * this.level;
         this.def = this.standartDef;
         updateItems();
     }

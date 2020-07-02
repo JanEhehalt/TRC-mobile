@@ -28,7 +28,7 @@ public class Earthwizard extends Entity{
         this.dmg = 8*lvl;
         this.id = 8;
         this.type = 1;
-        this.exp = lvl * 5;
+        this.exp = (lvl+1) * 5;
         minRange = 60;
         maxRange = 150;
         attackSpeed = 80;

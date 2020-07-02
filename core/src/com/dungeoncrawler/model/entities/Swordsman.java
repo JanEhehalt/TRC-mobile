@@ -14,7 +14,7 @@ public class Swordsman extends Entity {
         this.dmg = 12*lvl;
         this.id = 1;
         this.type = 0;
-        this.exp = lvl * 5;
+        this.exp = (lvl+1) * 5;
         
         // TODO: Sinnvolle Werte finden
         direction = 2;

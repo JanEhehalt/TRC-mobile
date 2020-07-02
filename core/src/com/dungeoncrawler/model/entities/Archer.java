@@ -19,6 +19,7 @@ public class Archer extends Entity{
         this.dmg = 5*lvl;
         this.id = 0;
         this.type = 1;
+        this.exp = lvl * 5;
         minRange = 70;
         maxRange = 210;
         attackSpeed = 70;

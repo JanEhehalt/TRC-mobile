@@ -13,6 +13,7 @@ public class Darkswordsman extends Entity {
         this.direction = 1;
         this.dmg = 12*lvl;
         this.id = 26;
+        this.exp = lvl * 5;
         this.type = 0;
         
         // TODO: Sinnvolle Werte finden

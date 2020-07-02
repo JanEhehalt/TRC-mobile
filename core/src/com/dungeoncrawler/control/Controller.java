@@ -394,6 +394,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 if(gs != null){;
                     d.getPlayer().updateItems();
                     hc.updateHud(batch, d.getPlayer());
+                    d.getPlayer().updateStats(level + 1);
                     gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY, camera, d.getVisited());
                 }
                 
@@ -644,6 +645,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                                     e[i].setHp(0);
                                     gs.createDmgFont((int) p.getDmg(),(int)e[i].getxPos() + 10,(int) e[i].getyPos() + 20);
                                     e[i].setToDelete(true);
+                                    p.addExp(e[i].getExp());
                                     kills++;
                                 }
                                 else{

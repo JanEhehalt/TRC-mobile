@@ -28,6 +28,7 @@ public class Waterwizard extends Entity{
         this.dmg = 12*lvl;
         this.id = 18;
         this.type = 1;
+        this.exp = lvl * 5;
         minRange = 65;
         maxRange = 130;
         attackSpeed = 50;

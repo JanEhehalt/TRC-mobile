@@ -19,6 +19,7 @@ public abstract class Entity {
     protected boolean targetsPlayer;
     protected int standartDef;
     protected int def;
+    protected int exp;
     
     
 
@@ -33,6 +34,7 @@ public abstract class Entity {
         this.targetsPlayer = true;
         this.standartDef = 0;
         this.def = 0;
+        this.exp = 0;
     }
     
     public boolean attack(Entity e){
@@ -222,5 +224,15 @@ public abstract class Entity {
     }
     public int getDef(){
         return def;
+    }
+
+    public int getExp(){
+        return exp;
+    }
+    public void setExp(int exp){
+        this.exp = exp;
+    }
+    public void addExp(int exp){
+        this.exp = this.exp + exp;
     }
 }

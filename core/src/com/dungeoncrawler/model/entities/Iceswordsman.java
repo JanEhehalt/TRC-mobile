@@ -14,6 +14,7 @@ public class Iceswordsman extends Entity {
         this.dmg = 14*lvl;
         this.id = 15;
         this.type = 0;
+        this.exp = lvl * 5;
         
         // TODO: Sinnvolle Werte finden
         direction = 2;

@@ -28,6 +28,7 @@ public class Firewizard extends Entity{
         this.dmg = 9*lvl;
         this.id = 6;
         this.type = 1;
+        this.exp = lvl * 5;
         minRange = 50;
         maxRange = 130;
         attackSpeed = 60;

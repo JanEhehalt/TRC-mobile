@@ -28,6 +28,7 @@ public class Naturewizard extends Entity{
         this.dmg = 8*lvl;
         this.id = 22;
         this.type = 1;
+        this.exp = lvl * 5;
         minRange = 60;
         maxRange = 150;
         attackSpeed = 80;

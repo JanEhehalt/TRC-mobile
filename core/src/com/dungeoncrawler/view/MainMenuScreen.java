@@ -26,6 +26,7 @@ public class MainMenuScreen{
         Sprite settingsButtonSprite;
         Sprite maleButton;
         Sprite femaleButton;
+        BitmapFont font;
         
         boolean hidden;
         
@@ -61,7 +62,7 @@ public class MainMenuScreen{
                 float wc = w/2;
                 
                 gender = "m";
-                
+                font = new BitmapFont();
                 hidden = false;
                 
                 Texture backgroundTexture = new Texture("sprites/MAINSCREEN.png");
@@ -137,6 +138,8 @@ public class MainMenuScreen{
                         playerSprite.setRegion(playerRegion[shownPlayer][0][animationState]);
                     }
                 },0, 0.1f);
+
+
                 
                 
                 // Sound
@@ -174,6 +177,8 @@ public class MainMenuScreen{
                         femaleButton.draw(batch);
                     }
                 }
+
+
                 batch.end();
 	}
 

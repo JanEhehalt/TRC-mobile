@@ -544,8 +544,10 @@ public class GameScreen {
         }
         
         public void deleteEntitySprite(int i){
+	        entitySprites[i].getSprites()[0].getTexture().dispose();
             entitySprites[i] = null;
         }
+
         
         public void updateDamageContainer(){
             for(int x = 0; x < dmgContainer.length; x++){

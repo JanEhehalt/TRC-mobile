@@ -86,12 +86,17 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     
     @Override
     public void create(){
-        GAME_WORLD_HEIGHT = 900;
         GAME_WORLD_WIDTH = 1600;
+        GAME_WORLD_HEIGHT = 900;
+        camera = null;
+        viewport = null;
         camera = new OrthographicCamera();
+        camera.update();
         viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         viewport.apply();
         camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
+        camera.update();
 
         checkDoor = true;
         checkDie = true;
@@ -297,7 +302,9 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             if(delete || d.getCurrentEntities()[i].isToDelete()){
                                 if(d.getCurrentEntities()[i].getType()== 2){
                                     d.getPlayer().addExp(d.getCurrentEntities()[i].getExp());
+                                    System.out.println(d.getCurrentEntities()[i].getExp());
                                     d.getCurrentEntities()[i] = null;
+
                                     gs.deleteEntitySprite(i);
                                 }
                                 else{
@@ -335,7 +342,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         Gdx.gl.glClearColor(0, 0, 0, 1);
 	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         
-        if(end == true){
+        if(end){
             if(es == null){
                 isPaused = true;
                 entityMovement.stop();
@@ -974,12 +981,36 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
             case 1:
                 mm.cleanUp();
                 mm = null;
+                GAME_WORLD_WIDTH = 700;
+                GAME_WORLD_HEIGHT = 394;
+                camera = null;
+                viewport = null;
+                camera = new OrthographicCamera();
+                camera.update();
+                viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+                viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                viewport.apply();
+                camera.position.set(GAME_WORLD_WIDTH / 2 - 170, GAME_WORLD_HEIGHT / 2 + 20, 0);
+                camera.update();
+                batch.setProjectionMatrix(camera.combined);
                 gs = new GameScreen(d, volume);
                 break;
 
             case 2:
                 mm.hide();
                 cs = null;
+                GAME_WORLD_WIDTH = 1600;
+                GAME_WORLD_HEIGHT = 900;
+                camera = null;
+                viewport = null;
+                camera = new OrthographicCamera();
+                camera.update();
+                viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+                viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                viewport.apply();
+                camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
+                camera.update();
+                batch.setProjectionMatrix(camera.combined);
                 ss = new SettingsScreen();
                 break;
 
@@ -1031,6 +1062,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 }
                 break;
             case 11:
+
                 create();
                 break;
 

@@ -28,6 +28,7 @@ public class Healwizard extends Entity{
         this.dmg = 12*lvl;
         this.id = 20;
         this.type = 1;
+        this.exp = (lvl+1) * 5;
         minRange = 64;
         maxRange = 124;
         attackSpeed = 60;

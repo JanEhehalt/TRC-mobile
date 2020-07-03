@@ -14,6 +14,7 @@ public class Fireswordsman extends Entity {
         this.dmg = 15*lvl;
         this.id = 10;
         this.type = 0;
+        this.exp = (lvl+1) * 5;
         
         // TODO: Sinnvolle Werte finden
         direction = 2;

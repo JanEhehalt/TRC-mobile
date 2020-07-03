@@ -22,6 +22,8 @@ public class Player extends Entity {
     String gender;
     float standartMovementSpeed;
     float movementSpeed;
+
+    int level;
     
     public Player() {
         super(200, 200, 1);
@@ -49,11 +51,12 @@ public class Player extends Entity {
     
     public void updateStats(int ey){
         this.lvl = ey+1;
-        this.maxhp = 50 * this.lvl;
-        this.standartMaxHp = 50 * this.lvl;
-        this.standartDmg = 20 * this.lvl;
+        this.level = (this.exp / 10) + 1;
+        this.maxhp = 50 * this.level;
+        this.standartMaxHp = 50 * this.level;
+        this.standartDmg = 20 * this.level;
         this.dmg = this.standartDmg;
-        this.standartDef = 4 * lvl;
+        this.standartDef = 4 * this.level;
         this.def = this.standartDef;
         updateItems();
     }

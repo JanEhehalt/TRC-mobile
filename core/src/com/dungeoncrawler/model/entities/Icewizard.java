@@ -28,6 +28,7 @@ public class Icewizard extends Entity{
         this.dmg = 10*lvl;
         this.id = 16;
         this.type = 1;
+        this.exp = (lvl+1) * 5;
         minRange = 70;
         maxRange = 190;
         attackSpeed = 80;

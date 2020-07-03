@@ -18,6 +18,9 @@ public class Dungeon {
     private Level currentLevel;
     private Room currentRoom;
     private Entity[] currentEntities;
+
+    // 0: not found, 1: found, 2: visited
+    private int[][] isVisited;
     
     public Dungeon(Player player){
         this.level = new Level[7];
@@ -26,6 +29,10 @@ public class Dungeon {
     
     public void update(){
         // TODO: Implementieren
+    }
+
+    public void initVisited(int amount){
+        isVisited = new int[amount][amount];
     }
     
     /**
@@ -102,6 +109,54 @@ public class Dungeon {
      */
     public void setCurrentEntities(Entity[] currentEntities) {
         this.currentEntities = currentEntities;
+    }
+
+    public int getVisited(int i, int j){
+        return isVisited[i][j];
+    }
+
+    public int[][] getVisited(){
+        return isVisited;
+    }
+
+    public void setVisited(int i, int j, int value){
+        isVisited[i][j] = value;
+    }
+
+    public void updateVisited(int roomX, int roomY){
+
+        // currentRoom is visited, therefore set to 2
+        isVisited[roomX][roomY] = 2;
+
+        // all neighboring rooms are now found, set to 1, if possible
+
+        // left
+        if(roomX > 0 && currentLevel.getRooms()[roomX - 1][roomY] != null){
+            if(isVisited[roomX - 1][roomY] != 2) {
+                isVisited[roomX - 1][roomY] = 1;
+            }
+        }
+
+        // right
+        if(roomX < currentLevel.getRooms().length - 1 && currentLevel.getRooms()[roomX + 1][roomY] != null){
+            if(isVisited[roomX + 1][roomY] != 2) {
+                isVisited[roomX + 1][roomY] = 1;
+            }
+        }
+
+        // top
+        if(roomY > 0 && currentLevel.getRooms()[roomX][roomY - 1] != null){
+            if(isVisited[roomX][roomY - 1] != 2) {
+                isVisited[roomX][roomY - 1] = 1;
+            }
+        }
+
+        // bottom
+        if(roomY < currentLevel.getRooms().length - 1 && currentLevel.getRooms()[roomX][roomY + 1] != null){
+            if(isVisited[roomX][roomY + 1] != 2) {
+                isVisited[roomX][roomY + 1] = 1;
+            }
+        }
     }
     
 }

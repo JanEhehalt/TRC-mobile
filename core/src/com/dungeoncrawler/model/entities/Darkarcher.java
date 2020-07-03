@@ -19,6 +19,7 @@ public class Darkarcher extends Entity{
         this.dmg = 7*lvl;
         this.id = 27;
         this.type = 1;
+        this.exp = (lvl+1) * 5;
         minRange = 80;
         maxRange = 240;
         attackSpeed = 100;

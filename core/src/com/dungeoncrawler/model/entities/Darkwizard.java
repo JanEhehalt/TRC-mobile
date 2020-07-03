@@ -28,6 +28,7 @@ public class Darkwizard extends Entity{
         this.dmg = 10*lvl;
         this.id = 24;
         this.type = 1;
+        this.exp = (lvl+1) * 5;
         minRange = 140;
         maxRange = 170;
         attackSpeed = 70; // higher = slower

@@ -2,6 +2,7 @@ package com.dungeoncrawler.view;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,14 +10,19 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Timer;
 import com.dungeoncrawler.model.Dungeon;
 import com.dungeoncrawler.model.Entity;
 import com.dungeoncrawler.model.entities.*;
+
+import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -39,10 +45,20 @@ public class GameScreen {
         private Map m;
         TiledMapRenderer tmr;
         TiledMap tm;
-        OrthographicCamera camera;
         public ArrayList<AnimatedObject> objects;
         public ArrayList<AnimatedObject> mapItems;
         public ArrayList<AnimatedObject> doors;
+
+        // MiniMap
+        ShapeRenderer shapeRenderer;
+        Sprite miniMapContainer;
+
+        int mapX = 10;
+        int mapY = 310;
+        int gap = 2;
+        int rectWidth = 15;
+        int rectHeight = 10;
+        float alpha = 0.5f;
         
         Timer animations;
         Timer animatePlayer;
@@ -65,6 +81,11 @@ public class GameScreen {
         public Music music;
         
         //Inventory TEST
+
+        // CONTROLS
+        ArrayList<Button> controls;
+        int mouseX;
+        int mouseY;
         
         float animationSpeed = 0.1f;
         
@@ -102,8 +123,6 @@ public class GameScreen {
                 float h = Gdx.graphics.getHeight();
                 
                 m = new Map();
-                camera = new OrthographicCamera(1, h/w);
-                camera.translate(175f, 215f);
                 
                 
                 Texture[] tempTextures = new Texture[d.getLevel().length];
@@ -115,6 +134,10 @@ public class GameScreen {
                 
                 m = mg.generateMap(d);
                 mg.ichWillSpielen(m.getMaps());
+
+                shapeRenderer = new ShapeRenderer();
+                miniMapContainer = new Sprite(new Texture(Gdx.files.internal("sprites/miniMapContainer.png")));
+                miniMapContainer.setPosition(mapX - 10, mapY - 20);
                 
                 tm = new TiledMap();
                 tmr = new OrthogonalTiledMapRenderer(tm);
@@ -175,14 +198,44 @@ public class GameScreen {
                        }
                     }
                 },0, 0.03f);
+
+                // CONTROLS
+                    controls = new ArrayList();
+                    int hudX = -160;
+                    int hudY = 25;
+                    controls.add(new Button("sprites/controls/arrowLeft.png", hudX + 0, hudY + 50, 0));
+                    controls.add(new Button("sprites/controls/arrowUp.png", hudX + 50, hudY + 100, 1));
+                    controls.add(new Button("sprites/controls/arrowRight.png", hudX + 100, hudY + 50, 2));
+                    controls.add(new Button("sprites/controls/arrowDown.png", hudX + 50, hudY + 0, 3));
+                    controls.add(new Button("sprites/controls/arrowLeft.png", 550-170, 75, 4));
+                    controls.add(new Button("sprites/controls/arrowUp.png", 600-170, 125, 5));
+                    controls.add(new Button("sprites/controls/arrowRight.png", 650-170, 75, 6));
+                    controls.add(new Button("sprites/controls/arrowDown.png", 600-170, 25, 7));
+                    controls.add(new Button("sprites/controls/pickUp.png", 160-110, 30, 8));
+                    controls.add(new Button("sprites/controls/equip1.png", 160-110, 120, 9));
+                    controls.add(new Button("sprites/controls/drop.png", 160+110, 30, 10));
+                    controls.add(new Button("sprites/controls/equip2.png", 160+110, 120, 11));
+                    controls.add(new Button("sprites/controls/use.png", 600-170, 200, 12));
+                    // INVENTORY
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -118, 334, 20));      //0
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -69, 334, 21));       //1
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -144, 282, 22));      //2
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -92, 282, 23));       //3
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -42, 282, 24));       //4
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -144, 231, 25));      //5
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -92, 231, 26));       //6
+                    controls.add(new Button("sprites/controls/inventorySlot.png", -42, 231, 27));       //7
                 
 	}
 
-	public void render (SpriteBatch batch, Player p, Entity[] e, int tileX, int tileY, int level, int roomPosX, int roomPosY) {
+	public void render (SpriteBatch batch, Player p, Entity[] e, int tileX, int tileY, int level, int roomPosX, int roomPosY, OrthographicCamera camera, int[][] miniMap) {
+
+            shapeRenderer.setProjectionMatrix(camera.combined);
 
             entities = e;
             
             this.p = p;
+
             
             //playerMoving = (p.getMovementX() != 0 || p.getMovementY() != 0);
 
@@ -209,10 +262,6 @@ public class GameScreen {
             //MAP
             tmr.setView(camera);
             tmr.render();
-            
-            camera.zoom = 700f; // Standart 700f
-            camera.update();
-            batch.setProjectionMatrix(camera.combined);
             
             updateEntitySprites(e);
         
@@ -266,8 +315,62 @@ public class GameScreen {
                     font.draw(batch, text, dmgContainer[x].getCurrentX(), dmgContainer[x].getCurrentY());
                 }
             }
+
+            for(Button button : controls){
+                button.getSprite().draw(batch);
+            }
+
+            miniMapContainer.draw(batch);
             
             batch.end();
+
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+
+            for(int i = 0; i < miniMap.length; i++){
+                for(int j = 0; j < miniMap.length; j++){
+
+                    // current Room
+                    if(i == roomPosX && j == roomPosY){
+                        shapeRenderer.setColor(0, 0.75f, 0, alpha);
+                    }
+                    // not found
+                    else if(miniMap[i][j] == 0){
+                        shapeRenderer.setColor(0, 0, 0, alpha);
+                    }
+                    // found
+                    else if(miniMap[i][j] == 1){
+                        shapeRenderer.setColor(0.2f, 0.2f, 0.2f, alpha);
+                    }
+                    // visited
+                    else if(miniMap[i][j] == 2){
+                        shapeRenderer.setColor(0.5f, 0.5f, 0.5f, alpha);
+                    }
+
+                    if(miniMap[i][j] != 0) {
+                        shapeRenderer.rect(i * gap + i * rectWidth + mapX, j * gap + j * rectHeight + mapY, rectWidth, rectHeight);
+                        shapeRenderer.setColor(Color.RED);
+                    }
+                }
+            }
+            shapeRenderer.end();
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+
+            // BUTTON HITBOXES
+/*
+            ShapeRenderer lol = new ShapeRenderer();
+            lol.setProjectionMatrix(camera.combined);
+            lol.begin(ShapeRenderer.ShapeType.Filled);
+            for(Button button : controls){
+                lol.rect(button.getxPos(), button.getyPos(), button.getWidth(), button.getHeight());
+            }
+            lol.circle(mouseX,mouseY,15);
+            lol.end();
+*/
+
+
 	}
         
         public void generateEntitySprites(Entity[] e){
@@ -441,8 +544,10 @@ public class GameScreen {
         }
         
         public void deleteEntitySprite(int i){
+	        entitySprites[i].getSprites()[0].getTexture().dispose();
             entitySprites[i] = null;
         }
+
         
         public void updateDamageContainer(){
             for(int x = 0; x < dmgContainer.length; x++){
@@ -496,20 +601,14 @@ public class GameScreen {
         }
         
         public void stop(){
-            camera.zoom = 1600;
-            camera.translate(625f, 241f);
             animations.stop();
             animatePlayer.stop();
         }
         public void resume(){
-            camera.zoom = 700;
-            camera.translate(-625f, -241f);
             animations.start();
             animatePlayer.start();
         }
         public void end(){
-            camera.zoom = 1600;
-            camera.translate(625f, 241f);
             animations.stop();
             animatePlayer.stop();
             cleanUp();
@@ -523,8 +622,18 @@ public class GameScreen {
                 }
             }
         }
-        public OrthographicCamera getCamera(){
-            return camera;
+        public ArrayList<Integer> click(int x, int y){
+            x = (int)(((float)x) / (float)Gdx.graphics.getWidth() * 700f) -170;
+            y = 380- (int)(((float)y) / (float)Gdx.graphics.getHeight() * 380f)+ 25;
+            mouseX = x;
+            mouseY = y;
+            ArrayList<Integer> clicks = new ArrayList();
+            Circle mouse = new Circle(x,y,20);
+            for(Button button : controls){
+                if(Intersector.overlaps(mouse, button.getSprite().getBoundingRectangle())){
+                    clicks.add(button.getId());
+                }
+            }
+            return clicks;
         }
-       
 }

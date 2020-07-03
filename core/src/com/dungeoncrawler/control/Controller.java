@@ -11,12 +11,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.dungeoncrawler.view.*;
 import com.dungeoncrawler.model.Dungeon;
 import com.dungeoncrawler.model.DungeonGenerator;
@@ -24,11 +27,19 @@ import com.dungeoncrawler.model.entities.*;
 import com.dungeoncrawler.model.Entity;
 import com.badlogic.gdx.utils.Timer;
 import com.dungeoncrawler.model.ItemContainer;
+
 import java.util.ArrayList;
 
 public class Controller extends ApplicationAdapter implements InputProcessor{
     
-    
+    float  GAME_WORLD_WIDTH;
+    float GAME_WORLD_HEIGHT;
+
+    // CAMERA
+    OrthographicCamera camera;
+    Viewport viewport;
+
+
     SpriteBatch batch;
     Dungeon d;
     DungeonGenerator dg;
@@ -75,7 +86,18 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     
     @Override
     public void create(){
-        
+        GAME_WORLD_WIDTH = 1600;
+        GAME_WORLD_HEIGHT = 900;
+        camera = null;
+        viewport = null;
+        camera = new OrthographicCamera();
+        camera.update();
+        viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        viewport.apply();
+        camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
+        camera.update();
+
         checkDoor = true;
         checkDie = true;
         
@@ -115,6 +137,9 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         d.setCurrentLevel(d.getLevel()[level]);
         d.setCurrentRoom(d.getCurrentLevel().getRooms()[roomPosX][roomPosY]);
         d.setCurrentEntities(d.getCurrentRoom().getEnemies());
+
+        d.initVisited(roomAmount);
+        d.updateVisited(roomPosX, roomPosY);
 
         Gdx.input.setInputProcessor(this);
         
@@ -276,7 +301,10 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
 
                             if(delete || d.getCurrentEntities()[i].isToDelete()){
                                 if(d.getCurrentEntities()[i].getType()== 2){
+                                    d.getPlayer().addExp(d.getCurrentEntities()[i].getExp());
+                                    System.out.println(d.getCurrentEntities()[i].getExp());
                                     d.getCurrentEntities()[i] = null;
+
                                     gs.deleteEntitySprite(i);
                                 }
                                 else{
@@ -302,19 +330,35 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
        
     }
     
-    
+    @Override
+    public void resize(int width, int height){
+        viewport.update(width, height);
+        camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
+    }
+
+
     @Override
     public void render(){
         Gdx.gl.glClearColor(0, 0, 0, 1);
-	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+	    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         
-        if(end == true){
+        if(end){
             if(es == null){
                 isPaused = true;
                 entityMovement.stop();
                 gs.end();
-                gs.getCamera().update();
-                batch.setProjectionMatrix(gs.getCamera().combined);
+                GAME_WORLD_WIDTH = 1600;
+                GAME_WORLD_HEIGHT = 900;
+                camera = null;
+                viewport = null;
+                camera = new OrthographicCamera();
+                camera.update();
+                viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+                viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                viewport.apply();
+                camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
+                camera.update();
+                batch.setProjectionMatrix(camera.combined);
                 gs = null;
                 hc = null;
                 es = new EndScreen(kills);
@@ -332,7 +376,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
             cs.render(batch);
         }
         if(ps != null){
-            ps.render(batch, volume, gs.getCamera());
+            ps.render(batch, volume, camera);
         }
         
         //PASSIERT IN GAMESCREEN
@@ -357,8 +401,9 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 // Render methode zum rendern der einzelnen Sprites wird aufgerufen
                 if(gs != null){;
                     d.getPlayer().updateItems();
-                    gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY);
                     hc.updateHud(batch, d.getPlayer());
+                    d.getPlayer().updateStats(level + 1);
+                    gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY, camera, d.getVisited());
                 }
                 
         }
@@ -527,16 +572,22 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 int roomAmount = d.getLevel()[level].getRooms().length;
                 roomPosX = roomAmount / 2;
                 roomPosY = roomAmount / 2;
+
+                d.initVisited(roomAmount);
+                d.updateVisited(roomPosX, roomPosY);
             }
             else{ // Dungeon Exit
                 end = true;
                 return;
             }
         }
+
+        d.updateVisited(roomPosX, roomPosY);
         
         d.setCurrentLevel(d.getLevel()[level]);
         d.setCurrentRoom(d.getCurrentLevel().getRooms()[roomPosX][roomPosY]);
         d.setCurrentEntities(d.getCurrentRoom().getEnemies());
+
         
         gs.generateEntitySprites(d.getCurrentEntities());
         
@@ -602,6 +653,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                                     e[i].setHp(0);
                                     gs.createDmgFont((int) p.getDmg(),(int)e[i].getxPos() + 10,(int) e[i].getyPos() + 20);
                                     e[i].setToDelete(true);
+                                    p.addExp(e[i].getExp());
                                     kills++;
                                 }
                                 else{
@@ -709,7 +761,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                         d.getPlayer().useItem(d.getPlayer().getInv().getSelected());
                     }
                 }
-                
+                /*
                 if(keycode == Input.Keys.ESCAPE && !end){
                     if(gs != null && gs.getIsLoading() == false && isPaused == false){
                         stop();
@@ -718,7 +770,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                         resume();
                     }
                 }
-                
+                */
                 if(keycode == Input.Keys.LEFT){
                     if(mm != null){}
                     if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
@@ -754,7 +806,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                     if(mm != null){}
                     if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                         Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() + 1, (int) d.getPlayer().getyPos());
-                        
+
                         for(int k = 5; k < d.getCurrentEntities().length; k++){
                             if(d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1){
                                 d.getCurrentEntities()[k] = lol;
@@ -901,13 +953,25 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     @Override
   public boolean touchDown(int screenX, int screenY, int pointer, int button)
   {
-    //if(button == Input.Buttons.LEFT){
+      if(gs == null){
         switch(click(screenX, screenY)){
             case -1:  // -1: nothing hit -- 0: go ingame -- 1: EXIT game -- 2: goto settings -- 3: goto controls -- 4: goto MainMenuScreen -- 9: volume down -- 10: volume up -- 11: restart game
                 break;
             case 0:
                 mm.cleanUp();
                 mm = null;
+                GAME_WORLD_WIDTH = 700;
+                GAME_WORLD_HEIGHT = 394;
+                camera = null;
+                viewport = null;
+                camera = new OrthographicCamera();
+                camera.update();
+                viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+                viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                viewport.apply();
+                camera.position.set(GAME_WORLD_WIDTH / 2 - 170, GAME_WORLD_HEIGHT / 2 + 20, 0);
+                camera.update();
+                batch.setProjectionMatrix(camera.combined);
                 gs = new GameScreen(d, volume);
                 gs.generateEntitySprites(d.getCurrentEntities());
                 hc = new HudContainer();
@@ -917,12 +981,36 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
             case 1:
                 mm.cleanUp();
                 mm = null;
+                GAME_WORLD_WIDTH = 700;
+                GAME_WORLD_HEIGHT = 394;
+                camera = null;
+                viewport = null;
+                camera = new OrthographicCamera();
+                camera.update();
+                viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+                viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                viewport.apply();
+                camera.position.set(GAME_WORLD_WIDTH / 2 - 170, GAME_WORLD_HEIGHT / 2 + 20, 0);
+                camera.update();
+                batch.setProjectionMatrix(camera.combined);
                 gs = new GameScreen(d, volume);
                 break;
 
             case 2:
                 mm.hide();
                 cs = null;
+                GAME_WORLD_WIDTH = 1600;
+                GAME_WORLD_HEIGHT = 900;
+                camera = null;
+                viewport = null;
+                camera = new OrthographicCamera();
+                camera.update();
+                viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+                viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                viewport.apply();
+                camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
+                camera.update();
+                batch.setProjectionMatrix(camera.combined);
                 ss = new SettingsScreen();
                 break;
 
@@ -974,34 +1062,174 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 }
                 break;
             case 11:
+
                 create();
                 break;
-        }
 
-        if(gs == null){
-            mm.cleanUp();
-            mm = null;
-            gs = new GameScreen(d, volume);
-            gs.generateEntitySprites(d.getCurrentEntities());
-            hc = new HudContainer();
-            gs.startLoadingScreen();
         }
-        else if(gs != null && gs.getIsLoading() == false) {
-              if (screenX < 0.25 * Gdx.graphics.getWidth()) {
-                  d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
-              }
-              else if (screenX > 0.75 * Gdx.graphics.getWidth()) {
-                  d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
-              }
-              if (screenX > 0.25 * Gdx.graphics.getWidth() && screenX < 0.75 * Gdx.graphics.getWidth() && screenY > 0.5 * Gdx.graphics.getHeight()) {
-                    d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
-              }
-                else if(screenX > 0.25 * Gdx.graphics.getWidth() && screenX < 0.75 * Gdx.graphics.getWidth() && screenY < 0.5 * Gdx.graphics.getHeight()){
-                    d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
+      }
+
+          if(gs != null){
+            if(!d.getPlayer().isToDelete()) {
+                ArrayList<Integer> clicked = gs.click(screenX,screenY);
+                for (Integer i : clicked) {
+                    switch (i) {        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown, 8: pickUp
+                        case 0:
+                            d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
+                            break;
+                        case 1:
+                            d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
+                            break;
+                        case 2:
+                            d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
+                            break;
+                        case 3:
+                            d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
+                            break;
+                        case 4:
+                            if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                                Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() - 1, (int) d.getPlayer().getyPos());
+
+                                for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                    if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                        d.getCurrentEntities()[k] = lol;
+                                        gs.generateNewEntitySprite(lol, k);
+                                        gs.player.startSecondaryAttack();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 5:
+                            if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                                Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() + 1);
+
+                                for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                    if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                        d.getCurrentEntities()[k] = lol;
+                                        gs.generateNewEntitySprite(lol, k);
+                                        gs.player.startSecondaryAttack();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case 6:
+                            if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                                Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() + 1, (int) d.getPlayer().getyPos());
+
+                                for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                    if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                        d.getCurrentEntities()[k] = lol;
+                                        gs.generateNewEntitySprite(lol, k);
+                                        gs.player.startSecondaryAttack();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case 7:
+                            if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                                Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() - 1);
+
+                                for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                    if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                        d.getCurrentEntities()[k] = lol;
+                                        gs.generateNewEntitySprite(lol, k);
+                                        gs.player.startSecondaryAttack();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case 8:
+                            // pickUp
+                            if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
+                                if(!d.getPlayer().inventoryFull()){
+                                    ArrayList<ItemContainer> garbage = playerPickUp();
+
+                                    for(ItemContainer item : garbage){
+                                        d.getPlayer().getInv().addItem(item.getItem());
+                                    }
+                                }
+                            }
+                            break;
+                        case 9:
+                            // equip1
+                            if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().equipSlot(0);
+                                d.getPlayer().updateItems();
+                            }
+                            break;
+                        case 10:
+                            // drop
+                            if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
+                                if(d.getPlayer().getInv().getItem(d.getPlayer().getInv().getSelected()) != null){
+                                    d.getCurrentRoom().spawnItem((int)d.getPlayer().getxPos(), (int)d.getPlayer().getyPos(), d.getPlayer().getInv().getItem(d.getPlayer().getInv().getSelected()));
+                                    gs.getM().getMaps()[level][roomPosX][roomPosY].addItem(48, 48,(int)d.getPlayer().getxPos(), (int)d.getPlayer().getyPos(), d.getPlayer().getInv().getItem(d.getPlayer().getInv().getSelected()));
+                                    d.getPlayer().getInv().dropItem();
+                                    d.getPlayer().updateItems();
+                                }
+                            }
+                            break;
+                        case 11:
+                            // equip2
+                            if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().equipSlot(1);
+                                d.getPlayer().updateItems();
+                            }
+                            break;
+                        case 12:
+                            // use
+                            if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
+                                d.getPlayer().useItem(d.getPlayer().getInv().getSelected());
+                            }
+                            break;
+                        case 20:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(0);
+                            }
+                            break;
+                        case 21:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(1);
+                            }
+                            break;
+                        case 22:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(2);
+                            }
+                            break;
+                        case 23:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(3);
+                            }
+                            break;
+                        case 24:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(4);
+                            }
+                            break;
+                        case 25:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(5);
+                            }
+                            break;
+                        case 26:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(6);
+                            }
+                            break;
+                        case 27:
+                            if(!d.getPlayer().isToDelete()){
+                                d.getPlayer().getInv().setSelected(7);
+                            }
+                            break;
+                    }
                 }
-          }
-
-    //}
+            }
+        }
       return true;
     }
 
@@ -1012,7 +1240,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         if(ps != null){
             return ps.click(x,y);
         }
-        if(mm != null && mm.getHidden() ==  false){
+        if(mm != null && !mm.getHidden()){
             return mm.click(x, y);
         }
         if(ss != null){
@@ -1021,21 +1249,111 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         if(cs != null){
             return cs.click(x, y);
         }
-        if(gs != null && isPaused == true){
-        
-        }
         return -1;
     }
   
   
     @Override
-    public boolean touchUp(int i, int i1, int i2, int i3) {
-        return false;
+    public boolean touchUp(int screenX, int screenY, int i2, int i3) {
+        if(gs != null){
+            if(gs.click(screenX,screenY).contains(0) || gs.click(screenX,screenY).contains(1)|| gs.click(screenX,screenY).contains(2)|| gs.click(screenX,screenY).contains(3)){
+                        d.getPlayer().setMovementX(0);
+                        d.getPlayer().setMovementY(0);
+            }
+        }
+        return true;
     }
 
     @Override
-    public boolean touchDragged(int i, int i1, int i2) {
-        return false;
+    public boolean touchDragged(int screenX, int screenY, int i2) {
+
+        if(gs != null){
+            if(!d.getPlayer().isToDelete()) {
+
+                if(!gs.click(screenX,screenY).contains(0) || !gs.click(screenX,screenY).contains(2)){
+                    d.getPlayer().setMovementX(0);
+                }
+
+                if(!gs.click(screenX,screenY).contains(1) || !gs.click(screenX,screenY).contains(3)){
+                    d.getPlayer().setMovementY(0);
+                }
+                ArrayList<Integer> clicked = gs.click(screenX,screenY);
+                for (Integer i : clicked) {
+                    switch (i) {        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown
+                        case 0:
+                            d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
+                            break;
+                        case 1:
+                            d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
+                            break;
+                        case 2:
+                            d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
+                            break;
+                        case 3:
+                            d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
+                            break;
+                        case 4:
+                            if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                                Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() - 1, (int) d.getPlayer().getyPos());
+
+                                for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                    if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                        d.getCurrentEntities()[k] = lol;
+                                        gs.generateNewEntitySprite(lol, k);
+                                        gs.player.startSecondaryAttack();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 5:
+                            if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                                Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() + 1);
+
+                                for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                    if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                        d.getCurrentEntities()[k] = lol;
+                                        gs.generateNewEntitySprite(lol, k);
+                                        gs.player.startSecondaryAttack();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case 6:
+                            if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                                Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() + 1, (int) d.getPlayer().getyPos());
+
+                                for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                    if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                        d.getCurrentEntities()[k] = lol;
+                                        gs.generateNewEntitySprite(lol, k);
+                                        gs.player.startSecondaryAttack();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case 7:
+                            if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                                Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() - 1);
+
+                                for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                    if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                        d.getCurrentEntities()[k] = lol;
+                                        gs.generateNewEntitySprite(lol, k);
+                                        gs.player.startSecondaryAttack();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     @Override
@@ -1061,13 +1379,36 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
         entityMovement.stop();
         gs.stop();
         cs = null;
+        GAME_WORLD_WIDTH = 1600;
+        GAME_WORLD_HEIGHT = 900;
+        camera = null;
+        viewport = null;
+        camera = new OrthographicCamera();
+        camera.update();
+        viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        viewport.apply();
+        camera.position.set(GAME_WORLD_WIDTH / 2, GAME_WORLD_HEIGHT / 2, 0);
+        camera.update();
         ps = new PauseScreen();
     }
     public void resume(){
+        GAME_WORLD_WIDTH = 700;
+        GAME_WORLD_HEIGHT = 394;
+        camera = null;
+        viewport = null;
+        camera = new OrthographicCamera();
+        camera.update();
+        viewport = new StretchViewport(GAME_WORLD_WIDTH, GAME_WORLD_HEIGHT, camera);
+        viewport.update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        viewport.apply();
+        camera.position.set(GAME_WORLD_WIDTH / 2 - 170, GAME_WORLD_HEIGHT / 2 + 20, 0);
+        camera.update();
         isPaused = false;
         entityMovement.start();
         gs.resume();
-        
+
+
         ps = null;
         gs.startLoadingScreen();
     }

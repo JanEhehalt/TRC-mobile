@@ -228,7 +228,7 @@ public class GameScreen {
                 
 	}
 
-	public void render (SpriteBatch batch, Player p, Entity[] e, int tileX, int tileY, int level, int roomPosX, int roomPosY, OrthographicCamera camera, int[][] miniMap) {
+	public void render (SpriteBatch batch, Player p, Entity[] e, int tileX, int tileY, int level, int roomPosX, int roomPosY, OrthographicCamera camera, int[][] miniMap, boolean touch) {
 
             shapeRenderer.setProjectionMatrix(camera.combined);
 
@@ -316,6 +316,7 @@ public class GameScreen {
                 }
             }
 
+            if(touch)
             for(Button button : controls){
                 button.getSprite().draw(batch);
             }

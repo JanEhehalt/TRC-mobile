@@ -35,6 +35,8 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     float  GAME_WORLD_WIDTH;
     float GAME_WORLD_HEIGHT;
 
+    boolean touch;
+
     // CAMERA
     OrthographicCamera camera;
     Viewport viewport;
@@ -88,6 +90,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     public void create(){
         GAME_WORLD_WIDTH = 1600;
         GAME_WORLD_HEIGHT = 900;
+        touch = false;
         camera = null;
         viewport = null;
         camera = new OrthographicCamera();
@@ -403,7 +406,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                     d.getPlayer().updateItems();
                     hc.updateHud(batch, d.getPlayer());
                     d.getPlayer().updateStats(level + 1);
-                    gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY, camera, d.getVisited());
+                    gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY, camera, d.getVisited(), touch);
                 }
                 
         }
@@ -1075,18 +1078,23 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 for (Integer i : clicked) {
                     switch (i) {        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown, 8: pickUp
                         case 0:
+                            if(touch)
                             d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
                             break;
                         case 1:
+                            if(touch)
                             d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
                             break;
                         case 2:
+                            if(touch)
                             d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
                             break;
                         case 3:
+                            if(touch)
                             d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
                             break;
                         case 4:
+                            if(touch)
                             if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
                                 Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() - 1, (int) d.getPlayer().getyPos());
 
@@ -1102,6 +1110,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             break;
 
                         case 5:
+                            if(touch)
                             if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
                                 Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() + 1);
 
@@ -1116,6 +1125,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             }
                             break;
                         case 6:
+                            if(touch)
                             if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
                                 Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() + 1, (int) d.getPlayer().getyPos());
 
@@ -1130,6 +1140,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             }
                             break;
                         case 7:
+                            if(touch)
                             if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
                                 Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() - 1);
 
@@ -1144,6 +1155,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             }
                             break;
                         case 8:
+                            if(touch)
                             // pickUp
                             if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                                 if(!d.getPlayer().inventoryFull()){
@@ -1156,6 +1168,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             }
                             break;
                         case 9:
+                            if(touch)
                             // equip1
                             if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                                 d.getPlayer().getInv().equipSlot(0);
@@ -1164,6 +1177,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             break;
                         case 10:
                             // drop
+                            if(touch)
                             if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                                 if(d.getPlayer().getInv().getItem(d.getPlayer().getInv().getSelected()) != null){
                                     d.getCurrentRoom().spawnItem((int)d.getPlayer().getxPos(), (int)d.getPlayer().getyPos(), d.getPlayer().getInv().getItem(d.getPlayer().getInv().getSelected()));
@@ -1175,6 +1189,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             break;
                         case 11:
                             // equip2
+                            if(touch)
                             if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                                 d.getPlayer().getInv().equipSlot(1);
                                 d.getPlayer().updateItems();
@@ -1182,6 +1197,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             break;
                         case 12:
                             // use
+                            if(touch)
                             if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                                 d.getPlayer().useItem(d.getPlayer().getInv().getSelected());
                             }
@@ -1256,9 +1272,11 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     @Override
     public boolean touchUp(int screenX, int screenY, int i2, int i3) {
         if(gs != null){
-            if(gs.click(screenX,screenY).contains(0) || gs.click(screenX,screenY).contains(1)|| gs.click(screenX,screenY).contains(2)|| gs.click(screenX,screenY).contains(3)){
-                        d.getPlayer().setMovementX(0);
-                        d.getPlayer().setMovementY(0);
+            if(gs.click(screenX,screenY).contains(0) ||  gs.click(screenX,screenY).contains(2)){
+                d.getPlayer().setMovementX(0);
+            }
+            if(gs.click(screenX,screenY).contains(1)||  gs.click(screenX,screenY).contains(3)) {
+                d.getPlayer().setMovementY(0);
             }
         }
         return true;
@@ -1267,18 +1285,15 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     @Override
     public boolean touchDragged(int screenX, int screenY, int i2) {
 
-        if(gs != null){
+        if(gs != null && touch){
             if(!d.getPlayer().isToDelete()) {
-
-                if(!gs.click(screenX,screenY).contains(0) || !gs.click(screenX,screenY).contains(2)){
+                if(!gs.click(screenX,screenY).contains(0) && !gs.click(screenX,screenY).contains(2)) {
                     d.getPlayer().setMovementX(0);
                 }
-
-                if(!gs.click(screenX,screenY).contains(1) || !gs.click(screenX,screenY).contains(3)){
+                if(!gs.click(screenX,screenY).contains(1) && !gs.click(screenX,screenY).contains(3)) {
                     d.getPlayer().setMovementY(0);
                 }
-                ArrayList<Integer> clicked = gs.click(screenX,screenY);
-                for (Integer i : clicked) {
+                for (Integer i : gs.click(screenX,screenY)) {
                     switch (i) {        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown
                         case 0:
                             d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());

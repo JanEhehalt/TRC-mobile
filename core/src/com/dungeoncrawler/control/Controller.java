@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.dungeoncrawler.view.*;
@@ -35,7 +36,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     float  GAME_WORLD_WIDTH;
     float GAME_WORLD_HEIGHT;
 
-    boolean touch;
+    final boolean TOUCH = true;
 
     // CAMERA
     OrthographicCamera camera;
@@ -90,7 +91,6 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     public void create(){
         GAME_WORLD_WIDTH = 1600;
         GAME_WORLD_HEIGHT = 900;
-        touch = false;
         camera = null;
         viewport = null;
         camera = new OrthographicCamera();
@@ -175,7 +175,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             if(d.getPlayer().isToDelete()){
                                 attacks = false;
                             }
-                            // Attacke wird gestartet, wenn noch keine laueft
+                            // Attack starts if none is running
                             if(attacks && gs.entitySprites[i].getAttackState() == 0){
                                 gs.entitySprites[i].startAttack();
                             }
@@ -406,7 +406,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                     d.getPlayer().updateItems();
                     hc.updateHud(batch, d.getPlayer());
                     d.getPlayer().updateStats(level + 1);
-                    gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY, camera, d.getVisited(), touch);
+                    gs.render(batch, d.getPlayer(), d.getCurrentEntities(), tileX, tileY, level, roomPosX, roomPosY, camera, d.getVisited(), TOUCH);
                 }
                 
         }
@@ -1078,23 +1078,23 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                 for (Integer i : clicked) {
                     switch (i) {        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown, 8: pickUp
                         case 0:
-                            if(touch)
+                            if(TOUCH)
                             d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
                             break;
                         case 1:
-                            if(touch)
+                            if(TOUCH)
                             d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
                             break;
                         case 2:
-                            if(touch)
+                            if(TOUCH)
                             d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
                             break;
                         case 3:
-                            if(touch)
+                            if(TOUCH)
                             d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
                             break;
                         case 4:
-                            if(touch)
+                            if(TOUCH)
                             if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
                                 Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() - 1, (int) d.getPlayer().getyPos());
 
@@ -1110,7 +1110,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             break;
 
                         case 5:
-                            if(touch)
+                            if(TOUCH)
                             if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
                                 Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() + 1);
 
@@ -1125,7 +1125,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             }
                             break;
                         case 6:
-                            if(touch)
+                            if(TOUCH)
                             if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
                                 Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() + 1, (int) d.getPlayer().getyPos());
 
@@ -1140,7 +1140,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             }
                             break;
                         case 7:
-                            if(touch)
+                            if(TOUCH)
                             if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
                                 Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() - 1);
 
@@ -1155,7 +1155,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             }
                             break;
                         case 8:
-                            if(touch)
+                            if(TOUCH)
                             // pickUp
                             if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                                 if(!d.getPlayer().inventoryFull()){
@@ -1168,7 +1168,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             }
                             break;
                         case 9:
-                            if(touch)
+                            if(TOUCH)
                             // equip1
                             if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                                 d.getPlayer().getInv().equipSlot(0);
@@ -1177,7 +1177,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             break;
                         case 10:
                             // drop
-                            if(touch)
+                            if(TOUCH)
                             if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                                 if(d.getPlayer().getInv().getItem(d.getPlayer().getInv().getSelected()) != null){
                                     d.getCurrentRoom().spawnItem((int)d.getPlayer().getxPos(), (int)d.getPlayer().getyPos(), d.getPlayer().getInv().getItem(d.getPlayer().getInv().getSelected()));
@@ -1189,7 +1189,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             break;
                         case 11:
                             // equip2
-                            if(touch)
+                            if(TOUCH)
                             if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                                 d.getPlayer().getInv().equipSlot(1);
                                 d.getPlayer().updateItems();
@@ -1197,7 +1197,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
                             break;
                         case 12:
                             // use
-                            if(touch)
+                            if(TOUCH)
                             if(gs != null && gs.getIsLoading() == false && !d.getPlayer().isToDelete()){
                                 d.getPlayer().useItem(d.getPlayer().getInv().getSelected());
                             }
@@ -1272,12 +1272,93 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     @Override
     public boolean touchUp(int screenX, int screenY, int i2, int i3) {
         if(gs != null){
-            if(gs.click(screenX,screenY).contains(0) ||  gs.click(screenX,screenY).contains(2)){
+            ArrayList<Integer> e = gs.click(screenX,screenY);
+            if(e.contains(0)){
                 d.getPlayer().setMovementX(0);
             }
-            if(gs.click(screenX,screenY).contains(1)||  gs.click(screenX,screenY).contains(3)) {
+            if(e.contains(1)){
                 d.getPlayer().setMovementY(0);
             }
+            if(e.contains(2)){
+                d.getPlayer().setMovementX(0);
+            }
+            if(e.contains(3)){
+                d.getPlayer().setMovementY(0);
+            }
+            for (Integer i : gs.click(screenX,screenY)) {
+                switch (i) {        // -1: nix, 0: left, 1: up, 2: right, 3: down, 4: attackLeft, 5: attackUp, 6: attackRight, 7: attackDown
+                    case 0:
+                        d.getPlayer().setMovementX(-d.getPlayer().getMovementSpeed());
+                        break;
+                    case 1:
+                        d.getPlayer().setMovementY(d.getPlayer().getMovementSpeed());
+                        break;
+                    case 2:
+                        d.getPlayer().setMovementX(d.getPlayer().getMovementSpeed());
+                        break;
+                    case 3:
+                        d.getPlayer().setMovementY(-d.getPlayer().getMovementSpeed());
+                        break;
+                    case 4:
+                        if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                            Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() - 1, (int) d.getPlayer().getyPos());
+
+                            for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                    d.getCurrentEntities()[k] = lol;
+                                    gs.generateNewEntitySprite(lol, k);
+                                    gs.player.startSecondaryAttack();
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+
+                    case 5:
+                        if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                            Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() + 1);
+
+                            for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                    d.getCurrentEntities()[k] = lol;
+                                    gs.generateNewEntitySprite(lol, k);
+                                    gs.player.startSecondaryAttack();
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case 6:
+                        if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                            Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos() + 1, (int) d.getPlayer().getyPos());
+
+                            for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                    d.getCurrentEntities()[k] = lol;
+                                    gs.generateNewEntitySprite(lol, k);
+                                    gs.player.startSecondaryAttack();
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case 7:
+                        if (!gs.getIsLoading() && !d.getPlayer().isToDelete()) {
+                            Entity lol = d.getPlayer().shoot((int) d.getPlayer().getxPos(), (int) d.getPlayer().getyPos() - 1);
+
+                            for (int k = 5; k < d.getCurrentEntities().length; k++) {
+                                if (d.getCurrentEntities()[k] == null && gs.player.getSecondaryAttackState() != 1) {
+                                    d.getCurrentEntities()[k] = lol;
+                                    gs.generateNewEntitySprite(lol, k);
+                                    gs.player.startSecondaryAttack();
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+
         }
         return true;
     }
@@ -1285,7 +1366,7 @@ public class Controller extends ApplicationAdapter implements InputProcessor{
     @Override
     public boolean touchDragged(int screenX, int screenY, int i2) {
 
-        if(gs != null && touch){
+        if(gs != null && TOUCH){
             if(!d.getPlayer().isToDelete()) {
                 if(!gs.click(screenX,screenY).contains(0) && !gs.click(screenX,screenY).contains(2)) {
                     d.getPlayer().setMovementX(0);
